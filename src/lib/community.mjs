@@ -57,7 +57,7 @@ export function normalizeDiscussion(d) {
     number: d.number, title: String(d.title), body: String(d.body || ''),
     excerpt: String(d.bodyText || '').replace(/\s+/g, ' ').replace(/^(?:板块(?:（.*?）)?\s*)?(?:#[^\s]+\s*)+/, '').replace(/^正文\s*/, '').slice(0, 180),
     url: safeGithubUrl(d.url), createdAt: d.createdAt, updatedAt: d.updatedAt,
-    author: d.author?.login || '已注销用户',
+    author: d.author?.login || '已注销用户', avatar: d.author?.avatarUrl || '',
     ...parsed, type: category === 'q-a' ? 'question' : category === 'show-and-tell' ? 'release' : 'article',
     category, comments: d.comments?.totalCount || 0,
     upvotes: d.upvoteCount || 0, answered: !!d.isAnswered, locked: !!d.locked, closed: !!d.closed,

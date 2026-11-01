@@ -1,5 +1,4 @@
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
+import { markdown } from '../lib/dom.mjs';
 import { parseBoards, validateArticle } from '../lib/boards.mjs';
 import { apiRequest, backendUrl, login, readSession, sessionKey } from '../lib/auth-client.mjs';
 
@@ -19,7 +18,7 @@ function save() {
   $('[data-release-help]').hidden=$('input[name=type]:checked')?.value!=='release';
 }
 function preview() {
-  $('[data-preview]').innerHTML=DOMPurify.sanitize(marked.parse(body.value||'*预览会显示在这里。*',{gfm:true}),{USE_PROFILES:{html:true},FORBID_TAGS:['form','input','button','textarea','style','iframe','video','audio'],FORBID_ATTR:['style','srcset']});
+  $('[data-preview]').replaceChildren(markdown(body.value||'*预览会显示在这里。*'));
   $('[data-preview]').querySelectorAll('a').forEach(a=>{a.rel='nofollow ugc noopener noreferrer';a.target='_blank';});
 }
 function renderBoards() {
@@ -80,7 +79,7 @@ $('[data-composer]').addEventListener('submit',async e=>{
     const result=await apiRequest(editNumber?`/posts/${editNumber}`:'/posts',{method:editNumber?'PUT':'POST',body:JSON.stringify({...article,requestId})});
     try{localStorage.removeItem(key);}catch{}
     $('[data-success]').hidden=false;
-    const source=new URL(result.url);if(source.origin==='https://github.com')$('[data-success-github]').href=source.href;
+    $('[data-success-local]').href=`/post/?number=${result.number}`;
     $('[data-success] h2').textContent=editNumber?'修改已保存。':'文章已发布。';note(`已保存为文章 #${result.number}。网站页面将在自动同步后更新。`);
     publish.textContent='已保存';busy=false;
     $('[data-composer]').querySelectorAll('input,textarea,button').forEach(el=>{el.disabled=true;});

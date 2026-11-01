@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="个人主页" active="profile">
+  <section class="profile-header" data-profile-header><h1>个人主页</h1><p>正在加载…</p></section>
+  <div class="profile-layout">
+    <section class="profile-content"><div class="profile-tabs" role="group" aria-label="个人内容"><button class="control" data-profile-tab="posts" aria-pressed="true">文章</button><button class="control" data-profile-tab="replies" aria-pressed="false">回复</button><button class="control" data-profile-tab="drafts" aria-pressed="false" hidden>本机草稿</button></div><p class="snapshot-note" data-profile-status role="status"></p><div data-profile-list></div><button class="control" data-profile-more hidden>加载更多文章</button></section>
+    <aside class="profile-rail"><h2>账号</h2><p>使用 GitHub 身份参与社区。</p><div data-profile-account></div><a href="/privacy/" class="control">隐私说明</a></aside>
+  </div>
+</Layout>
+<script src="../scripts/profile.mjs"></script>

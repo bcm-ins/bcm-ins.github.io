@@ -1,4 +1,5 @@
 import { parseBoards, validateArticle } from '../src/lib/boards.mjs';
+import { communityRoute } from './community.mjs';
 
 const enc = new TextEncoder();
 const dec = new TextDecoder();
@@ -50,7 +51,7 @@ async function github(token, query, variables) {
   if(response.status===403 || response.status===429) fail(403, 'GitHub 暂时拒绝此操作，请检查账号权限或稍后重试。');
   if(!response.ok) fail(502, 'GitHub 服务暂时不可用，请稍后检查原帖。');
   const data = await response.json();
-  if(data.errors?.length) fail(422, 'GitHub 未接受此操作。请确认应用已安装到社区仓库、账号可参与讨论，或到原帖检查状态。');
+  if(data.errors?.length) fail(data.data?502:422, 'GitHub 未确认此操作。请刷新文章检查结果，并确认账号可参与讨论。');
   return data.data;
 }
 async function session(request,env) {
@@ -114,6 +115,8 @@ async function handle(request,env) {
   const auth=await session(request,env);
   if(path==='/session' && request.method==='GET') return json({user:{login:auth.login},expiresAt:auth.expires_at*1000});
   if(path==='/session' && request.method==='DELETE') { await env.DB.prepare('DELETE FROM sessions WHERE session_hash=?').bind(auth.sessionHash).run(); return json({loggedOut:true}); }
+  const community=await communityRoute(request,env,auth,{github,fail,input,limit,hash,now});
+  if(community)return json(community);
   const match=path.match(/^\/posts\/([1-9]\d{0,9})$/);
   if(match && request.method==='GET') {
     const d=await getDiscussion(env,auth.token,Number(match[1]));

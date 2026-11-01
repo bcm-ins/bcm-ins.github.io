@@ -1,0 +1,31 @@
+---
+import Icon from './Icon.astro';
+import { renderMarkdown } from '../lib/community.mjs';
+const { post }=Astro.props;
+---
+<section data-thread data-number={post?.number}>
+  <nav class="breadcrumbs" aria-label="当前位置"><a href="/">社区文章</a><span>/</span><span>文章详情</span></nav>
+  <div class="thread-layout">
+    <div class="thread-main">
+      <article class="post" data-post-content>
+        {post ? <><div class="post-boards">{post.explicitBoards.map(b=><span class="tag">#{b}</span>)}</div><h1>{post.title}</h1><div class="prose post-body" set:html={renderMarkdown(post.content)}/><details class="source-details"><summary>原文与同步信息</summary><a href={post.url}>GitHub 原文</a></details></> : <p role="status">正在加载文章…</p>}
+      </article>
+      <section class="thread-discussion" id="comments" aria-label="文章回复">
+        <header class="thread-section-header"><h2>回复 <span data-comment-count></span></h2><button class="control" type="button" data-refresh>刷新讨论</button></header>
+        <p class="snapshot-note" data-thread-status role="status"></p>
+        <form class="reply-composer" id="reply-composer" data-reply-form>
+          <div class="reply-compose-heading"><h3 data-reply-title>发表回复</h3><button class="control" type="button" data-cancel-reply hidden>取消引用 / 编辑</button></div>
+          <label for="reply-body" class="sr-only">回复内容</label><textarea id="reply-body" rows="5" maxlength="50000" placeholder="回复内容，支持 Markdown" required></textarea>
+          <div class="reply-preview prose" data-reply-preview hidden></div>
+          <div class="reply-controls"><span data-reply-save>草稿保存在此设备</span><button class="control" type="button" data-preview-reply aria-pressed="false">预览</button><button class="button" type="submit" data-submit-reply>发表回复</button></div>
+          <p data-reply-message class="composer-message" role="status"></p>
+        </form>
+        <div data-comments></div>
+        <button class="control more-comments" data-more-comments type="button" hidden>加载更多回复</button>
+        <noscript><p>请启用 JavaScript 查看回复和使用编辑器。</p></noscript>
+      </section>
+    </div>
+    <aside class="thread-rail"><section><h2>作者</h2><div data-author-card></div></section><section><h2>文章板块</h2><div class="thread-board-list" data-thread-boards></div></section><section><h2>操作</h2><a class="control" href="/publish/"><Icon name="plus" size={16}/>发布文章</a><a class="control" href="/feedback/">问题反馈</a><a class="control" href="/moderation/">社区公约</a></section></aside>
+  </div>
+</section>
+<script src="../scripts/thread.mjs"></script>

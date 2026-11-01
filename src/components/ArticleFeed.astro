@@ -18,9 +18,9 @@ const { discussions, emptyTitle = '这里还没有文章', emptyDescription = '�
           <div class="article-boards">{d.explicitBoards.length ? d.explicitBoards.slice(0, 4).map(b => <a href={boardHref(b)} class="tag" title={b}>#{b.replaceAll('/', ' / ')}</a>) : <span class="tag neutral">未指定板块</span>}{d.explicitBoards.length > 4 && <span class="tag neutral">＋{d.explicitBoards.length - 4}</span>}</div>
           <h2><a href={`/posts/${d.number}/`}>{d.title}</a>{d.answered && <span class="answer-badge">已解答</span>}{d.locked && <span class="state-badge">已锁定</span>}{d.closed && <span class="state-badge">已关闭</span>}</h2>
           <p class="excerpt">{d.excerpt.replace(/^板块(?:（.*?）)?\s*(?:#[^\s]+\s*)+/, '').replace(/^正文\s*/, '')}</p>
-          <div class="article-meta"><span class="author-avatar" aria-hidden="true">{d.author.slice(0,1).toUpperCase()}</span><span>{d.author}</span><span class="meta-dot">·</span><span>{type.name}</span><span class="meta-dot">·</span><time datetime={d.updatedAt} title={new Date(d.updatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Taipei' })}>{formatDate(d.updatedAt)}活跃</time></div>
+          <div class="article-meta"><span class="author-avatar" aria-hidden="true">{d.author.slice(0,1).toUpperCase()}</span><a class="user-link" href={`/u/?user=${encodeURIComponent(d.author)}`}>{d.author}</a><span class="meta-dot">·</span><span>{type.name}</span><span class="meta-dot">·</span><time datetime={d.updatedAt} title={new Date(d.updatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Taipei' })}>{formatDate(d.updatedAt)}活跃</time></div>
         </div>
-        <a class="reply-count" href={`${d.url}#discussioncomment`} aria-label={`${d.comments} 条回复，前往 GitHub 讨论`}><Icon name="message" size={17}/><strong>{d.comments}</strong><small>回复</small></a>
+        <a class="reply-count" href={`/posts/${d.number}/#comments`} aria-label={`${d.comments} 条回复，查看站内讨论`}><Icon name="message" size={17}/><strong>{d.comments}</strong><small>回复</small></a>
       </article>;
     })}
   </div>

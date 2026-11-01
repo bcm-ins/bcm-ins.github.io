@@ -1,8 +1,70 @@
 {
-  "generatedAt": "2026-11-01T17:39:35.211Z",
+  "generatedAt": "2026-11-01T18:30:19.048Z",
   "repository": "bcm-ins/bcm-ins.github.io",
-  "totalCount": 3,
+  "totalCount": 4,
   "discussions": [
+    {
+      "number": 4,
+      "title": "1",
+      "body": "#相机固件/索尼/a7c2\n\nhello world",
+      "excerpt": "hello world",
+      "url": "https://github.com/bcm-ins/bcm-ins.github.io/discussions/4",
+      "createdAt": "2026-11-01T18:10:07Z",
+      "updatedAt": "2026-11-01T18:10:07Z",
+      "author": "bcm-ins",
+      "avatar": "https://avatars.githubusercontent.com/u/78684098?v=4",
+      "boards": [
+        "相机固件",
+        "相机固件/索尼",
+        "相机固件/索尼/a7c2"
+      ],
+      "explicitBoards": [
+        "相机固件/索尼/a7c2"
+      ],
+      "content": "hello world",
+      "boardWarnings": [],
+      "type": "article",
+      "category": "general",
+      "comments": 0,
+      "upvotes": 1,
+      "answered": false,
+      "locked": false,
+      "closed": false,
+      "labels": [],
+      "thread": []
+    },
+    {
+      "number": 2,
+      "title": "板块怎么用：一篇文章，连接机型、固件与工具",
+      "body": "#社区建设 #相机固件 #软件与工具\n\n板块与文章类型分别管理。左侧标识说明这是一篇知识文章、一个问题，还是一次作品发布；开头的标签说明它讨论什么。\n\n## 一个完整例子\n\n```markdown\n#相机固件/索尼/a7c2 #软件与工具\n\n## 实验目的\n说明想研究什么。\n\n## 条件与过程\n列出机型、版本、方法和观察。\n\n## 资料\n[源码](https://github.com/你的账号/项目)\n```\n\n这个例子会进入四个板块：相机固件、相机固件 / 索尼、相机固件 / 索尼 / a7c2，以及软件与工具。示例链接仅说明 Markdown 格式，不是已发布项目。\n\n## 新增和修改\n\n- 新板块：发布文章时使用新的标签，网站同步后即可浏览。\n- 多板块：在第一行用空格分隔多个 `#标签`。\n- 修改：编辑原帖最前面的板块行，旧归属会被替换。\n- 合并或更名建议：在 #社区建设 提出，避免不同拼写把资料分散。\n\n标签支持最多五层，每篇最多十二个显式标签。正文后面的标签和代码里的 `#include` 不会生成板块。\n\n[详细使用指南](https://bcm-ins.github.io/guide/#boards)\n\n## 修改后会发生什么\n\n这篇说明也属于「软件与工具」。编辑原帖开头的标签后，网站会自动重建文章归属；文章地址不变。GitHub 原帖保存 Markdown 正文，本站按最新版本显示。\n",
+      "excerpt": "板块与文章类型分别管理。左侧标识说明这是一篇知识文章、一个问题，还是一次作品发布；开头的标签说明它讨论什么。 一个完整例子 #相机固件/索尼/a7c2 #软件与工具 ## 实验目的 说明想研究什么。 ## 条件与过程 列出机型、版本、方法和观察。 ## 资料 [源码](https://github.com/你的账号/项目) 这个例子会进入四个板块：相机固件、",
+      "url": "https://github.com/bcm-ins/bcm-ins.github.io/discussions/2",
+      "createdAt": "2026-11-01T17:32:15Z",
+      "updatedAt": "2026-11-01T17:42:25Z",
+      "author": "bcm-ins",
+      "avatar": "https://avatars.githubusercontent.com/u/78684098?v=4",
+      "boards": [
+        "社区建设",
+        "相机固件",
+        "软件与工具"
+      ],
+      "explicitBoards": [
+        "社区建设",
+        "相机固件",
+        "软件与工具"
+      ],
+      "content": "板块与文章类型分别管理。左侧标识说明这是一篇知识文章、一个问题，还是一次作品发布；开头的标签说明它讨论什么。\n\n## 一个完整例子\n\n```markdown\n#相机固件/索尼/a7c2 #软件与工具\n\n## 实验目的\n说明想研究什么。\n\n## 条件与过程\n列出机型、版本、方法和观察。\n\n## 资料\n[源码](https://github.com/你的账号/项目)\n```\n\n这个例子会进入四个板块：相机固件、相机固件 / 索尼、相机固件 / 索尼 / a7c2，以及软件与工具。示例链接仅说明 Markdown 格式，不是已发布项目。\n\n## 新增和修改\n\n- 新板块：发布文章时使用新的标签，网站同步后即可浏览。\n- 多板块：在第一行用空格分隔多个 `#标签`。\n- 修改：编辑原帖最前面的板块行，旧归属会被替换。\n- 合并或更名建议：在 #社区建设 提出，避免不同拼写把资料分散。\n\n标签支持最多五层，每篇最多十二个显式标签。正文后面的标签和代码里的 `#include` 不会生成板块。\n\n[详细使用指南](https://bcm-ins.github.io/guide/#boards)\n\n## 修改后会发生什么\n\n这篇说明也属于「软件与工具」。编辑原帖开头的标签后，网站会自动重建文章归属；文章地址不变。GitHub 原帖保存 Markdown 正文，本站按最新版本显示。\n",
+      "boardWarnings": [],
+      "type": "article",
+      "category": "general",
+      "comments": 0,
+      "upvotes": 1,
+      "answered": false,
+      "locked": false,
+      "closed": false,
+      "labels": [],
+      "thread": []
+    },
     {
       "number": 3,
       "title": "社区反馈：希望这里怎样帮助你的相机研究？",
@@ -12,6 +74,7 @@
       "createdAt": "2026-11-01T17:32:17Z",
       "updatedAt": "2026-11-01T17:39:36Z",
       "author": "bcm-ins",
+      "avatar": "https://avatars.githubusercontent.com/u/78684098?v=4",
       "boards": [
         "社区建设"
       ],
@@ -27,35 +90,8 @@
       "answered": false,
       "locked": false,
       "closed": false,
-      "labels": []
-    },
-    {
-      "number": 2,
-      "title": "板块怎么用：一篇文章，连接机型、固件与工具",
-      "body": "#社区建设 #相机固件\n\n板块与文章类型分别管理。左侧标识说明这是一篇知识文章、一个问题，还是一次作品发布；开头的标签说明它讨论什么。\n\n## 一个完整例子\n\n```markdown\n#相机固件/索尼/a7c2 #软件与工具\n\n## 实验目的\n说明想研究什么。\n\n## 条件与过程\n列出机型、版本、方法和观察。\n\n## 资料\n[源码](https://github.com/你的账号/项目)\n```\n\n这个例子会进入四个板块：相机固件、相机固件 / 索尼、相机固件 / 索尼 / a7c2，以及软件与工具。示例链接仅说明 Markdown 格式，不是已发布项目。\n\n## 新增和修改\n\n- 新板块：发布文章时使用新的标签，网站同步后即可浏览。\n- 多板块：在第一行用空格分隔多个 `#标签`。\n- 修改：编辑原帖最前面的板块行，旧归属会被替换。\n- 合并或更名建议：在 #社区建设 提出，避免不同拼写把资料分散。\n\n标签支持最多五层，每篇最多十二个显式标签。正文后面的标签和代码里的 `#include` 不会生成板块。\n\n[详细使用指南](https://bcm-ins.github.io/guide/#boards)\n",
-      "excerpt": "板块与文章类型分别管理。左侧标识说明这是一篇知识文章、一个问题，还是一次作品发布；开头的标签说明它讨论什么。 一个完整例子 #相机固件/索尼/a7c2 #软件与工具 ## 实验目的 说明想研究什么。 ## 条件与过程 列出机型、版本、方法和观察。 ## 资料 [源码](https://github.com/你的账号/项目) 这个例子会进入四个板块：相机固件、",
-      "url": "https://github.com/bcm-ins/bcm-ins.github.io/discussions/2",
-      "createdAt": "2026-11-01T17:32:15Z",
-      "updatedAt": "2026-11-01T17:32:15Z",
-      "author": "bcm-ins",
-      "boards": [
-        "社区建设",
-        "相机固件"
-      ],
-      "explicitBoards": [
-        "社区建设",
-        "相机固件"
-      ],
-      "content": "板块与文章类型分别管理。左侧标识说明这是一篇知识文章、一个问题，还是一次作品发布；开头的标签说明它讨论什么。\n\n## 一个完整例子\n\n```markdown\n#相机固件/索尼/a7c2 #软件与工具\n\n## 实验目的\n说明想研究什么。\n\n## 条件与过程\n列出机型、版本、方法和观察。\n\n## 资料\n[源码](https://github.com/你的账号/项目)\n```\n\n这个例子会进入四个板块：相机固件、相机固件 / 索尼、相机固件 / 索尼 / a7c2，以及软件与工具。示例链接仅说明 Markdown 格式，不是已发布项目。\n\n## 新增和修改\n\n- 新板块：发布文章时使用新的标签，网站同步后即可浏览。\n- 多板块：在第一行用空格分隔多个 `#标签`。\n- 修改：编辑原帖最前面的板块行，旧归属会被替换。\n- 合并或更名建议：在 #社区建设 提出，避免不同拼写把资料分散。\n\n标签支持最多五层，每篇最多十二个显式标签。正文后面的标签和代码里的 `#include` 不会生成板块。\n\n[详细使用指南](https://bcm-ins.github.io/guide/#boards)\n",
-      "boardWarnings": [],
-      "type": "article",
-      "category": "general",
-      "comments": 0,
-      "upvotes": 1,
-      "answered": false,
-      "locked": false,
-      "closed": false,
-      "labels": []
+      "labels": [],
+      "thread": []
     },
     {
       "number": 1,
@@ -66,6 +102,7 @@
       "createdAt": "2026-11-01T17:32:14Z",
       "updatedAt": "2026-11-01T17:32:14Z",
       "author": "bcm-ins",
+      "avatar": "https://avatars.githubusercontent.com/u/78684098?v=4",
       "boards": [
         "社区建设"
       ],
@@ -81,7 +118,8 @@
       "answered": false,
       "locked": false,
       "closed": false,
-      "labels": []
+      "labels": [],
+      "thread": []
     }
   ]
 }

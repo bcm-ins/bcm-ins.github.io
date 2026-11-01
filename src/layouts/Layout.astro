@@ -1,6 +1,7 @@
 ---
 import '../styles/site.css';
 import '../styles/composer.css';
+import '../styles/community.css';
 import data from '../data/community.json';
 import Icon from '../components/Icon.astro';
 import { github, collectBoards, boardHref, boardName } from '../lib/community.mjs';
@@ -19,7 +20,7 @@ const apiOrigin = apiUrl ? new URL(apiUrl).origin : '';
     <meta name="theme-color" content="#ffffff" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="cam-ins-api" content={apiOrigin} />
-    <meta http-equiv="Content-Security-Policy" content={`default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self'; connect-src 'self' ${apiOrigin}; object-src 'none'; base-uri 'self'; form-action https://github.com; upgrade-insecure-requests`} />
+    <meta http-equiv="Content-Security-Policy" content={`default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self'; connect-src 'self' ${apiOrigin}; object-src 'none'; base-uri 'self'; form-action 'self' https://github.com; upgrade-insecure-requests`} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <title>{title} · cam-ins</title>
@@ -33,7 +34,8 @@ const apiOrigin = apiUrl ? new URL(apiUrl).origin : '';
         <a href="/boards/" aria-current={active === 'boards' ? 'page' : undefined}>板块</a>
         <a href="/guide/" aria-current={active === 'guide' ? 'page' : undefined}>使用指南</a>
       </nav>
-      <div class="header-actions"><a class="github-login" href="/publish/" data-account-link>GitHub 登录</a><a class="button small" href="/publish/"><Icon name="plus" size={17}/>发布文章</a></div>
+      <form action="/" method="get" class="header-search" role="search"><Icon name="search" size={18}/><label class="sr-only" for="global-search">搜索社区</label><input id="global-search" type="search" name="q" placeholder="搜索文章、作者、板块"/><button type="submit">搜索</button></form>
+      <div class="header-actions"><a class="github-login" href="/u/" data-account-link>GitHub 登录</a><a class="button small" href="/publish/"><Icon name="plus" size={17}/>发布文章</a></div>
     </header>
     <div class="shell">
       <aside class="sidebar" aria-label="社区导航">
@@ -41,6 +43,7 @@ const apiOrigin = apiUrl ? new URL(apiUrl).origin : '';
           <a class:list={['side-link', { selected: active === 'feed' && !activeBoard }]} href="/"><Icon name="article" size={18}/>全部文章</a>
           <a class="side-link" href="/?type=question"><Icon name="question" size={18}/>问题与解答</a>
           <a class="side-link" href="/?type=release"><Icon name="release" size={18}/>固件 / 软件</a>
+          <a class:list={['side-link',{selected:active==='profile'}]} href="/u/"><Icon name="user" size={18}/>个人中心</a>
         </div>
         <div class="sidebar-heading">浏览板块<a href="/boards/" aria-label="查看全部板块"><Icon name="arrow" size={15}/></a></div>
         <div class="sidebar-group board-tree">
@@ -57,7 +60,8 @@ const apiOrigin = apiUrl ? new URL(apiUrl).origin : '';
   </body>
 </html>
 <script>
-  import { readSession } from '../lib/auth-client.mjs';
-  const session=readSession();const account=document.querySelector('[data-account-link]');
-  if(session && account)account.textContent=`@${session.user.login}`;
+  import { readSession, login } from '../lib/auth-client.mjs';
+  const session=readSession();const account=document.querySelector<HTMLAnchorElement>('[data-account-link]');
+  if(session && account){account.textContent=`@${session.user.login}`;account.href=`/u/?user=${encodeURIComponent(session.user.login)}`;}
+  else account?.addEventListener('click',async e=>{e.preventDefault();try{await login(location.pathname+location.search+location.hash);}catch(error){location.assign('/u/');}});
 </script>

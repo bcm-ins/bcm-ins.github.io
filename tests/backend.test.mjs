@@ -70,3 +70,59 @@ test('Users cannot edit another author and network ambiguity cannot double-post'
     assert.equal((await worker.fetch(request('/posts',{method:'POST',body:article,token}),env)).status,409);assert.equal(calls,1);
   }finally{globalThis.fetch=originalFetch;}
 });
+
+const discussionFixture={id:'discussion-test',number:8,title:'Camera',body:'#相机固件\n\n正文',createdAt:'2026-11-01T00:00:00Z',updatedAt:'2026-11-01T00:00:00Z',locked:false,closed:false,upvoteCount:0,viewerCanUpvote:true,author:{login:'alice'},category:{slug:'general'},comments:{totalCount:1},url:'https://github.com/bcm-ins/bcm-ins.github.io/discussions/8'};
+const commentFixture={id:'comment-test',body:'回复内容',author:{login:'alice'},viewerCanUpdate:true,viewerCanDelete:true,viewerCanUpvote:true,viewerCanMarkAsAnswer:true,discussion:{number:8,repository:{nameWithOwner:'bcm-ins/bcm-ins.github.io'}},createdAt:'2026-11-01T00:00:00Z'};
+test('Reply creation uses user identity, scopes the parent, and suppresses duplicate writes',async()=>{
+  const env=envFor(),token=await authenticated(env),originalFetch=globalThis.fetch;let mutations=0;
+  globalThis.fetch=async(_url,options)=>{assert.equal(options.headers.Authorization,'Bearer github-user-secret');const {query,variables}=JSON.parse(options.body);let data;
+    if(query.includes('repository(owner:'))data={repository:{discussion:discussionFixture}};
+    else if(query.startsWith('mutation')){mutations++;assert.deepEqual(variables.input,{discussionId:'discussion-test',body:'实测回复',replyToId:'comment-test',clientMutationId:'reply_request_123456789'});data={addDiscussionComment:{comment:{...commentFixture,id:'new-comment'}}};}
+    else data={node:commentFixture};return new Response(JSON.stringify({data}));};
+  const body={body:' 实测回复 ',replyToId:'comment-test',requestId:'reply_request_123456789'};
+  try{const result=await worker.fetch(request('/threads/8/comments',{token,method:'POST',body}),env);assert.equal(result.status,200);assert.equal((await result.json()).comment.author,'alice');assert.equal((await worker.fetch(request('/threads/8/comments',{token,method:'POST',body}),env)).status,200);assert.equal(mutations,1);
+    globalThis.fetch=async(_url,options)=>{const {query}=JSON.parse(options.body);return new Response(JSON.stringify({data:query.includes('repository(owner:')?{repository:{discussion:discussionFixture}}:{node:{...commentFixture,discussion:{number:8,repository:{nameWithOwner:'other/repo'}}}}}));};
+    assert.equal((await worker.fetch(request('/threads/8/comments',{token,method:'POST',body:{...body,requestId:'another_request_123456'}}),env)).status,404);
+  }finally{globalThis.fetch=originalFetch;}
+});
+test('Reply permissions reject other authors, locked threads, and unauthorized answer marking',async()=>{
+  const env=envFor(),token=await authenticated(env),originalFetch=globalThis.fetch;let d={...discussionFixture},c={...commentFixture,author:{login:'bob'},viewerCanMarkAsAnswer:false};
+  globalThis.fetch=async(_url,options)=>{const {query}=JSON.parse(options.body);assert.equal(query.startsWith('mutation'),false);return new Response(JSON.stringify({data:query.includes('repository(owner:')?{repository:{discussion:d}}:{node:c}}));};
+  const body={body:'change',commentId:'comment-test',requestId:'permission_test_123456'};
+  try{for(const method of ['PUT','DELETE'])assert.equal((await worker.fetch(request('/threads/8/comments',{token,method,body}),env)).status,403);
+    assert.equal((await worker.fetch(request('/threads/8/answer',{token,method:'POST',body:{...body,enabled:true}}),env)).status,403);
+    d.locked=true;assert.equal((await worker.fetch(request('/threads/8/comments',{token,method:'POST',body}),env)).status,403);
+  }finally{globalThis.fetch=originalFetch;}
+});
+test('Live comment pages hide minimized content and separate pagination for replies',async()=>{
+  const env=envFor(),token=await authenticated(env),originalFetch=globalThis.fetch;
+  globalThis.fetch=async(_url,options)=>{const {query,variables}=JSON.parse(options.body);let data;
+    if(query.includes('repository(owner:'))data={repository:{discussion:discussionFixture}};
+    else{assert.equal(variables.after,'page_two');data={node:{comments:{pageInfo:{hasNextPage:true,endCursor:'page_three'},nodes:[{...commentFixture,isMinimized:true,body:'hidden moderation text',replies:{nodes:[],totalCount:40,pageInfo:{hasNextPage:true,endCursor:'more_replies'}}}]}}};}return new Response(JSON.stringify({data}));};
+  try{const result=await worker.fetch(request('/threads/8?after=page_two',{token}),env);assert.equal(result.status,200);const payload=await result.json();assert.equal(payload.comments[0].body,'');assert.equal(payload.comments[0].replyPageInfo.hasNextPage,true);assert.equal(payload.pageInfo.endCursor,'page_three');assert.equal(JSON.stringify(payload).includes('github-user-secret'),false);}finally{globalThis.fetch=originalFetch;}
+});
+test('Uncertain reply writes retain their request id instead of posting twice',async()=>{
+  const env=envFor(),token=await authenticated(env),originalFetch=globalThis.fetch;let writes=0;
+  globalThis.fetch=async(_url,options)=>{const {query}=JSON.parse(options.body);if(query.startsWith('mutation')){writes++;throw Error('network');}return new Response(JSON.stringify({data:{repository:{discussion:discussionFixture}}}));};
+  const body={body:'reply',requestId:'uncertain_reply_123456'};
+  try{assert.equal((await worker.fetch(request('/threads/8/comments',{token,method:'POST',body}),env)).status,502);assert.equal((await worker.fetch(request('/threads/8/comments',{token,method:'POST',body}),env)).status,409);assert.equal(writes,1);}finally{globalThis.fetch=originalFetch;}
+});
+
+test('Own reply editing, deletion retry, votes and answer mutations use scoped GitHub inputs',async()=>{
+  const env=envFor(),token=await authenticated(env),originalFetch=globalThis.fetch;let mutations=[],deleted=false;
+  globalThis.fetch=async(_url,options)=>{const {query,variables}=JSON.parse(options.body);let data;
+    if(query.includes('repository(owner:'))data={repository:{discussion:discussionFixture}};
+    else if(!query.startsWith('mutation'))data={node:deleted?null:commentFixture};
+    else{mutations.push(variables.input);if(query.includes('updateDiscussionComment'))data={updateDiscussionComment:{comment:{...commentFixture,body:variables.input.body}}};else{if(query.includes('deleteDiscussionComment'))deleted=true;data={};}}
+    return new Response(JSON.stringify({data}));
+  };
+  try{
+    const base={commentId:'comment-test'};
+    const edited=await worker.fetch(request('/threads/8/comments',{token,method:'PUT',body:{...base,body:'修改内容',requestId:'edit_reply_123456789'}}),env);assert.equal(edited.status,200);assert.equal((await edited.json()).comment.body,'修改内容');assert.equal(mutations[0].commentId,'comment-test');
+    for(const operation of ['vote','answer'])assert.equal((await worker.fetch(request(`/threads/8/${operation}`,{token,method:'POST',body:{...base,enabled:true,requestId:operation+'_reply_123456789'}}),env)).status,200);
+    assert.equal(mutations[1].subjectId,'comment-test');assert.equal(mutations[2].id,'comment-test');
+    const body={...base,requestId:'delete_reply_123456789'};
+    for(let i=0;i<2;i++)assert.equal((await worker.fetch(request('/threads/8/comments',{token,method:'DELETE',body}),env)).status,200);
+    assert.equal(mutations.length,4);assert.equal(mutations[3].id,'comment-test');
+  }finally{globalThis.fetch=originalFetch;}
+});
