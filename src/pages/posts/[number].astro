@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import data from '../../data/community.json';
+import Icon from '../../components/Icon.astro';
 import { boardHref, renderMarkdown, typeFor } from '../../lib/community.mjs';
 export function getStaticPaths() { return data.discussions.map(post => ({ params: { number: String(post.number) }, props: { post } })); }
 const { post } = Astro.props;
@@ -10,10 +11,10 @@ const type = typeFor(post.type);
   <nav class="breadcrumbs" aria-label="当前位置"><a href="/">社区文章</a><span>/</span><span>{type.name}</span></nav>
   <div class="post-grid"><article class="post">
     <div class="post-boards">{post.explicitBoards.map(b => <a href={boardHref(b)} class="tag">#{b.replaceAll('/', ' / ')}</a>)}{!post.boards.length && <a class="tag neutral" href="/guide/#boards">未指定板块 · 添加标签</a>}</div>
-    <header class="post-heading"><span class={`type-icon ${post.type}`} title={type.name} aria-label={type.name}>{type.symbol}</span><div><h1>{post.title}</h1><div class="post-meta"><a href={`https://github.com/${encodeURIComponent(post.author)}`}>{post.author}</a><span>·</span><time datetime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString('zh-CN', { timeZone: 'Asia/Taipei' })}</time><span>·</span><span>{type.name}</span>{post.answered && <span class="answer-badge">已解答</span>}{post.locked && <span class="state-badge">已锁定</span>}{post.closed && <span class="state-badge">已关闭</span>}</div></div></header>
+    <header class="post-heading"><span class={`type-icon ${post.type}`} title={type.name} aria-label={type.name}><Icon name={post.type} size={23}/></span><div><h1>{post.title}</h1><div class="post-meta"><a href={`https://github.com/${encodeURIComponent(post.author)}`}>{post.author}</a><span>·</span><time datetime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString('zh-CN', { timeZone: 'Asia/Taipei' })}</time><span>·</span><span>{type.name}</span>{post.answered && <span class="answer-badge">已解答</span>}{post.locked && <span class="state-badge">已锁定</span>}{post.closed && <span class="state-badge">已关闭</span>}</div></div></header>
     {post.boardWarnings.map(message => <p class="inline-notice">{message} <a href="/guide/#boards">板块说明</a></p>)}
     <div class="prose post-body" set:html={renderMarkdown(post.content)} />
     <div class="post-source"><span>Markdown 原文由 {post.author} 发布。本站展示公开内容快照。</span><a href={`/publish/?edit=${post.number}`}>在本站编辑我的文章</a><a href={post.url}>GitHub 原文 ↗</a></div>
-    <section class="discussion-box" aria-label="参与讨论"><div><span class="eyebrow">KEEP THE CONVERSATION GOING</span><h2>{post.comments ? `${post.comments} 条回复，继续讨论` : '你的观察，会让这篇记录更完整。'}</h2><p>{post.locked ? '该讨论已锁定，当前回复权限以 GitHub 页面为准。' : '用 GitHub 账号回复、补充资料，或订阅后续进展。最新回复与问题答案请在原帖查看。'}</p></div><a href={post.url} class="button">前往 GitHub 讨论 ↗</a></section>
+    <section class="discussion-box" aria-label="参与讨论"><div><h2>{post.comments ? `${post.comments} 条回复` : '讨论'}</h2><p>{post.locked ? '该讨论已锁定，当前回复权限以 GitHub 页面为准。' : '用 GitHub 账号回复、补充资料，或订阅后续进展。最新回复与问题答案请在原帖查看。'}</p></div><a href={post.url} class="button">前往 GitHub 讨论 ↗</a></section>
   </article><aside class="post-aside"><h3>这篇文章的板块</h3>{post.boards.map(b => <a href={boardHref(b)}>#{b.replaceAll('/', ' / ')}</a>)}<hr/><a href="/publish/">＋ 我也写一篇</a><a href="/guide/#boards">如何修改类型与板块</a>{post.type === 'release' && <a href="/firmware-guide/">下载与固件发布说明</a>}<a href="/moderation/">反馈不当内容</a></aside></div>
 </Layout>

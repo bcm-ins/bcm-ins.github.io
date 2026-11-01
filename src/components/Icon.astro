@@ -1,0 +1,29 @@
+---
+const { name = 'article', size = 20 } = Astro.props;
+const paths = {
+  article: 'M7 3h7l4 4v14H5V3h2M14 3v5h4M8 12h7M8 16h7',
+  question: 'M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2-3 4M12 17h.01',
+  release: 'M12 3v12m-5-5 5 5 5-5M5 16v5h14v-5',
+  grid: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
+  plus: 'M12 5v14M5 12h14',
+  search: 'm16 16 5 5',
+  message: 'M21 4H3v13h5l4 4 4-4h5V4Z',
+  shield: 'M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Zm-4 9 3 3 5-6',
+  arrow: 'M5 12h14m-5-5 5 5-5 5',
+  camera: 'M3 7h4l2-3h6l2 3h4v13H3V7Z',
+  link: 'm10 13 4-4M8 15l-1 1a3.5 3.5 0 0 1-5-5l4-4a3.5 3.5 0 0 1 5 0m2 2 1-1a3.5 3.5 0 0 1 5 5l-4 4a3.5 3.5 0 0 1-5 0',
+  image: 'M3 3h18v18H3zM3 17l6-6 4 4 3-3 5 5',
+  code: 'm8 6-6 6 6 6m8-12 6 6-6 6m-3-14-2 16',
+  list: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+  bold: 'M6 3h7a4.5 4.5 0 0 1 0 9H6V3Zm0 9h8a4.5 4.5 0 0 1 0 9H6v-9Z',
+  italic: 'M10 3h10M4 21h10M15 3 9 21',
+  heading: 'M4 4v16M16 4v16M4 12h12M20 17v4',
+};
+---
+<svg class="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  {name === 'question' && <circle cx="12" cy="12" r="9"/>}
+  {name === 'search' && <circle cx="10.5" cy="10.5" r="6.5"/>}
+  {name === 'camera' && <circle cx="12" cy="13" r="4"/>}
+  {name === 'image' && <circle cx="16" cy="7" r="1"/>}
+  <path d={paths[name] || paths.article}/>
+</svg>

@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 ---
-<Layout title="完成登录"><div class="guide-card auth-callback"><span class="eyebrow">WELCOME BACK</span><h1>正在完成登录…</h1><p role="status" data-auth-status>正在验证授权，请保持此标签页打开。</p><a href="/publish/" class="button secondary">返回编辑器</a></div></Layout>
+<Layout title="完成登录"><div class="guide-card auth-callback"><h1>正在完成登录…</h1><p role="status" data-auth-status>正在验证授权，请保持此标签页打开。</p><a href="/publish/" class="button secondary">返回编辑器</a></div></Layout>
 <script>
   import { apiRequest, flowKey, sessionKey } from '../../lib/auth-client.mjs';
   const status=document.querySelector('[data-auth-status]')!;

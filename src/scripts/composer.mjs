@@ -50,7 +50,7 @@ function updateAccount(){
   const session=readSession();
   $('[data-account-status]').textContent=session?`以 @${session.user.login} 的身份发布`:'可以先写作，发布时使用 GitHub 账号登录。';
   $('[data-login]').hidden=!!session;$('[data-logout]').hidden=!session;
-  publish.textContent=editNumber?'保存修改 ↗':'发布文章 ↗';
+  publish.textContent=editNumber?'保存修改':'发布文章';
   const account=$('[data-account-link]');if(account)account.textContent=session?'@'+session.user.login:'GitHub 登录';
 }
 async function beginLogin(){save();try{await login(location.pathname+location.search);}catch(e){note(e.message,true);}}
@@ -58,7 +58,7 @@ $('[data-login]').addEventListener('click',beginLogin);
 $('[data-logout]').addEventListener('click',async()=>{try{await apiRequest('/session',{method:'DELETE'});sessionStorage.removeItem(sessionKey);updateAccount();note('已退出此标签页的登录，草稿仍保留。');}catch(e){if(e.status===401){sessionStorage.removeItem(sessionKey);updateAccount();}note(e.message,true);}});
 updateAccount();
 if(!backendUrl())note('站内登录与发布服务正在配置中；你可以先写作、预览和导出草稿。');
-if(editNumber){$('[data-editor-title]').textContent='继续完善这份记录。';if(!readSession())note('登录后可加载你的原文；当前草稿不会被覆盖。');else if(!hadDraft)apiRequest(`/posts/${editNumber}`).then(restore).catch(e=>note(e.message,true));}
+if(editNumber){$('[data-editor-title]').textContent='编辑文章';if(!readSession())note('登录后可加载你的原文；当前草稿不会被覆盖。');else if(!hadDraft)apiRequest(`/posts/${editNumber}`).then(restore).catch(e=>note(e.message,true));}
 boardInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addBoard();}});
 $('[data-add-board]').addEventListener('click',addBoard);
 let timer;[title,body].forEach(el=>el.addEventListener('input',()=>{save();clearTimeout(timer);timer=setTimeout(preview,180);}));

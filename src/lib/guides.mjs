@@ -1,5 +1,5 @@
 export const guides = [
-  { slug: 'guide', title: '从一篇文章开始', subtitle: '一本开放的相机技术笔记，也是一处能认真讨论问题的地方。', body: `
+  { slug: 'guide', title: '使用指南', subtitle: '账号登录、文章发布与板块管理。', body: `
 ## 用 GitHub 账号参与
 
 点击「发布文章」进入本站编辑器，选择类型、添加板块并撰写 Markdown。发布时前往 GitHub 登录并授权社区应用，随后自动返回本站完成发布；没有账号的朋友可先在 GitHub 注册。本站不收集 GitHub 密码。
@@ -46,7 +46,7 @@ export const guides = [
 
 板块更名、合并、站点功能建议，请到[建议与反馈](/feedback/)。
 ` },
-  { slug: 'firmware-guide', title: '把作品介绍清楚，再交给下一位使用者', subtitle: '固件与软件也是文章，下载链接、代码和发布说明都放在正文里。', body: `
+  { slug: 'firmware-guide', title: '固件 / 软件发布规范', subtitle: '固件与软件也是文章，下载链接、代码和发布说明都放在正文里。', body: `
 ## 推荐发布方式
 
 1. 在你自己的 GitHub 仓库准备源码、说明和许可。
@@ -85,7 +85,7 @@ SHA-256：填写实际计算的 64 位哈希
 
 更新版本可以编辑原文，保留旧版本链接与变更记录；重大更新也可另开一篇文章，链接到前一篇。
 ` },
-  { slug: 'moderation', title: '认真讨论，留下可以复核的记录', subtitle: '社区公约与管理说明。', body: `
+  { slug: 'moderation', title: '社区公约', subtitle: '社区公约与管理说明。', body: `
 ## 讨论约定
 
 - 围绕相机硬件、固件、测量和工具交流，描述机型、版本和实际观察。
@@ -132,7 +132,7 @@ GitHub 的内容历史、CDN 缓存、搜索引擎和第三方已保存副本不
 
 GitHub Pages 和 Discussions 适用 [GitHub 服务条款](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service)及[隐私声明](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)。账号访问、平台可用性和通知由 GitHub 管理。授权后端使用 Cloudflare 服务，相关处理见 [Cloudflare 隐私政策](https://www.cloudflare.com/privacypolicy/)。
 ` },
-  { slug: 'feedback', title: '一起把这里建好', subtitle: '反馈一个问题、提出一个新方向，或者完善板块结构。', body: `
+  { slug: 'feedback', title: '问题反馈', subtitle: '网站问题、功能建议和板块调整。', body: `
 ## 新建板块，不用等审批
 
 发表文章时，在最开头加入一个新标签即可，比如 \`#相机固件/佳能/R5\`。系统会自动建立板块及其父级。多个板块用空格分隔，板块命名和编辑方法见[使用指南](/guide/#boards)。
