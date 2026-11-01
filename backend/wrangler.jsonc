@@ -1,0 +1,25 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "cam-ins-community-api",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "observability": { "enabled": false },
+  "vars": {
+    "SITE_ORIGIN": "https://bcm-ins.github.io",
+    "REPOSITORY": "bcm-ins/bcm-ins.github.io",
+    "REPOSITORY_ID": "R_kgDOVfP6jA",
+    "CATEGORY_ARTICLE": "DIC_kwDOVfP6jM4DKKIK",
+    "CATEGORY_QUESTION": "DIC_kwDOVfP6jM4DKKIM",
+    "CATEGORY_RELEASE": "DIC_kwDOVfP6jM4DKKIO"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cam-ins-community",
+      "database_id": "4b312687-b8f5-4013-909f-ac0a346b049b",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "triggers": { "crons": ["43 */6 * * *"] }
+}

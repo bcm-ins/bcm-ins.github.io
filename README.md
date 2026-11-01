@@ -3,7 +3,7 @@
 网站：https://bcm-ins.github.io/
 讨论：https://github.com/bcm-ins/bcm-ins.github.io/discussions
 
-Astro 静态门户 + GitHub Discussions 社区。文章使用 Markdown，知识文章 / 问题 / 固件与软件发布共享同一阅读结构。原生 GitHub 负责登录、编辑、回复、通知和管理。
+Astro 静态门户 + GitHub Discussions 社区 + Cloudflare Workers 授权后端。文章使用 Markdown，知识文章 / 问题 / 固件与软件发布共享同一阅读结构。本站编辑器负责撰写、预览、草稿、发布和编辑；GitHub 负责账号授权、原文存储、回复、通知和管理。
 
 ## 板块
 
@@ -48,6 +48,7 @@ pnpm build
 - [框架调研与架构取舍](docs/FRAMEWORK_RESEARCH.md)
 - [社区公约](CODE_OF_CONDUCT.md)
 - [启动讨论记录](docs/LAUNCH_DISCUSSIONS.json)
-- 原文在 GitHub 编辑。板块首行可由作者修改；类型由 GitHub 分类决定，分类/置顶/锁定等操作遵循 GitHub 权限。
+- [授权后端部署与维护](docs/OAUTH_BACKEND.md)
+- 作者可在本站或 GitHub 编辑原文与板块；类型由 GitHub 分类决定，分类/置顶/锁定等操作遵循 GitHub 权限。
 - 当前为个人仓库，维护者 bcm-ins。未创建其他版主账号，不宣称具备组织的独立 triage 权限。
 - 网站问题通过 Issues 或 #社区建设 反馈。准备组织化、多版主或站内完整论坛时，先评估 Discourse / Flarum / NodeBB 的独立托管。

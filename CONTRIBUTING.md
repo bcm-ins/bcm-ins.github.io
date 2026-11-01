@@ -1,6 +1,6 @@
 # 参与 cam-ins
 
-无需源码写入权限。进入 [Discussions](https://github.com/bcm-ins/bcm-ins.github.io/discussions)，使用 GitHub 账号发表 Markdown 文章。
+无需源码写入权限。进入[本站编辑器](https://bcm-ins.github.io/publish/)，使用 GitHub 账号登录并发表 Markdown 文章；也可以直接使用 [Discussions](https://github.com/bcm-ins/bcm-ins.github.io/discussions)。
 
 | 类型 | GitHub 分类 |
 | --- | --- |

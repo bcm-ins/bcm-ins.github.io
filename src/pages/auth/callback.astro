@@ -1,0 +1,22 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="完成登录"><div class="guide-card auth-callback"><span class="eyebrow">WELCOME BACK</span><h1>正在完成登录…</h1><p role="status" data-auth-status>正在验证授权，请保持此标签页打开。</p><a href="/publish/" class="button secondary">返回编辑器</a></div></Layout>
+<script>
+  import { apiRequest, flowKey, sessionKey } from '../../lib/auth-client.mjs';
+  const status=document.querySelector('[data-auth-status]')!;
+  async function complete() {
+    const params=new URLSearchParams(location.hash.slice(1));
+    history.replaceState(null,'',location.pathname);
+    const flow=JSON.parse(sessionStorage.getItem(flowKey)||'null');
+    sessionStorage.removeItem(flowKey);
+    if(!flow || flow.expiresAt<Date.now() || params.get('state')!==flow.state) throw new Error('登录已过期或不是从此标签页发起。请返回编辑器重新登录。');
+    if(params.has('error'))throw new Error('授权未完成。你的草稿仍保留，可以回编辑器重试。');
+    const ticket=params.get('ticket');if(!ticket)throw new Error('没有收到登录验证信息。');
+    const result=await apiRequest('/session/exchange',{method:'POST',body:JSON.stringify({ticket,verifier:flow.verifier})});
+    sessionStorage.setItem(sessionKey,JSON.stringify(result));
+    const target=new URL(flow.returnTo,location.origin);
+    location.replace(target.origin===location.origin && target.pathname==='/publish/'?target.pathname+target.search:'/publish/');
+  }
+  complete().catch(error=>{status.textContent=error.message;document.querySelector('h1')!.textContent='登录尚未完成';});
+</script>

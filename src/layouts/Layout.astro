@@ -1,10 +1,13 @@
 ---
 import '../styles/site.css';
+import '../styles/composer.css';
 import data from '../data/community.json';
 import { github, collectBoards, boardHref, boardName } from '../lib/community.mjs';
 const { title = '相机硬件交流社区', description = 'cam-ins：一起研究相机硬件，分享知识、提出问题、发布固件与软件。', activeBoard = '', active = 'feed' } = Astro.props;
 const boards = collectBoards(data.discussions);
 const sidebarBoards = boards.filter(b => b.depth === 0 || b.name.startsWith('相机固件/')).slice(0, 14);
+const apiUrl = import.meta.env.PUBLIC_COMMUNITY_API || '';
+const apiOrigin = apiUrl ? new URL(apiUrl).origin : '';
 ---
 <!doctype html>
 <html lang="zh-CN">
@@ -14,7 +17,8 @@ const sidebarBoards = boards.filter(b => b.depth === 0 || b.name.startsWith('相
     <meta name="description" content={description} />
     <meta name="theme-color" content="#1e5347" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action https://github.com; upgrade-insecure-requests" />
+    <meta name="cam-ins-api" content={apiOrigin} />
+    <meta http-equiv="Content-Security-Policy" content={`default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self'; connect-src 'self' ${apiOrigin}; object-src 'none'; base-uri 'self'; form-action https://github.com; upgrade-insecure-requests`} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <title>{title} · cam-ins</title>
@@ -28,7 +32,7 @@ const sidebarBoards = boards.filter(b => b.depth === 0 || b.name.startsWith('相
         <a href="/boards/" aria-current={active === 'boards' ? 'page' : undefined}>板块</a>
         <a href="/guide/" aria-current={active === 'guide' ? 'page' : undefined}>使用指南</a>
       </nav>
-      <div class="header-actions"><a class="github-login" href={`${github}/discussions`}>用 GitHub 参与 <span aria-hidden="true">↗</span></a><a class="button small" href="/publish/">＋ 发布文章</a></div>
+      <div class="header-actions"><a class="github-login" href="/publish/" data-account-link>GitHub 登录</a><a class="button small" href="/publish/">＋ 发布文章</a></div>
     </header>
     <div class="shell">
       <aside class="sidebar" aria-label="社区导航">
@@ -51,3 +55,8 @@ const sidebarBoards = boards.filter(b => b.depth === 0 || b.name.startsWith('相
     <footer class="site-footer"><span><b>cam-ins</b> · 关于相机，继续往里看。</span><span><a href="/guide/">使用指南</a><a href={`${github}/discussions`}>GitHub Discussions ↗</a><a href={`${github}/blob/main/docs/FRAMEWORK_RESEARCH.md`}>框架调研</a></span></footer>
   </body>
 </html>
+<script>
+  import { readSession } from '../lib/auth-client.mjs';
+  const session=readSession();const account=document.querySelector('[data-account-link]');
+  if(session && account)account.textContent=`@${session.user.login}`;
+</script>

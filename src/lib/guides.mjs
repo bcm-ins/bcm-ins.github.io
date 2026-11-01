@@ -2,7 +2,9 @@ export const guides = [
   { slug: 'guide', title: '从一篇文章开始', subtitle: '一本开放的相机技术笔记，也是一处能认真讨论问题的地方。', body: `
 ## 用 GitHub 账号参与
 
-点击「发布文章」选择类型，进入 GitHub 编辑器。已有 GitHub 账号直接登录；没有账号的朋友可在 GitHub 注册，再参与社区。本站不额外建立账号或收集密码。
+点击「发布文章」进入本站编辑器，选择类型、添加板块并撰写 Markdown。发布时前往 GitHub 登录并授权社区应用，随后自动返回本站完成发布；没有账号的朋友可先在 GitHub 注册。本站不收集 GitHub 密码。
+
+编辑器支持撰写、对照、预览三种视图，以及本机草稿自动保存和 Markdown 导入、导出。登录仅在当前标签页保留，最长约 8 小时；关闭标签页或授权过期后可重新登录，草稿仍保存在当前设备。
 
 所有帖子都是 Markdown 文章。你可以使用标题、列表、表格、代码块、图片和链接；作者保留自己的原文，回复、通知、点赞和问题答案在 GitHub Discussions 中管理。
 
@@ -32,7 +34,7 @@ export const guides = [
 
 **创建板块**：使用尚不存在的新标签并发布文章，下一次同步后就会出现新板块，不需要先申请写入网站源码的权限。板块名使用文字、数字、下划线、短横线、点或加号，斜杠表示层级；不要加入空格。每篇最多 12 个显式板块、每个最多 5 层、80 个字符。名称区分大小写；建议沿用已有名称，例如统一用 a7c2。
 
-**修改归属**：作者在 GitHub 原帖右上角菜单中编辑正文，改动最开头的板块行即可。修改后旧归属移除、新归属加入；文章网址保持不变。正文中间、代码块里的 # 不用于创建板块。
+**修改归属**：作者点击文章底部「在本站编辑我的文章」，登录后调整板块并保存。也可以在 GitHub 原帖编辑正文最开头的板块行。修改后旧归属移除、新归属加入；文章网址保持不变。正文中间、代码块里的 # 不用于创建板块。
 
 **修改类型**：由有权限的维护者在 GitHub 调整原帖分类。普通成员无需因此申请源码写入权限，可通过[反馈入口](/feedback/)请求修改。对板块的日常调整由作者编辑标签完成。
 
@@ -56,7 +58,7 @@ export const guides = [
 
 ## 让读者知道它适用于什么
 
-建议包含以下字段；社区发布表单会提供对应位置：
+建议包含以下信息；选择发布类型后，编辑器可一键插入发布模板：
 
 | 信息 | 建议内容 |
 | --- | --- |
@@ -114,7 +116,11 @@ SHA-256：填写实际计算的 64 位哈希
 
 本站使用公开 GitHub Discussions。发表的正文、账号名、回复、附件和时间信息可被其他人阅读，文章原文会同步到本站并可能被搜索引擎收录。
 
-网站不保存你的密码、访问令牌，也不建立独立的会员资料库；登录与授权在 GitHub 进行。本网站未添加广告、第三方统计或追踪字体。文章里的外部图片和链接可能向对应服务发送访问请求。
+GitHub 负责账号注册、登录和授权，本站不接触你的 GitHub 密码。站内发布服务运行于 Cloudflare Workers，使用 D1 保存短期会话、GitHub 账号 ID 与名称，以及加密的用户访问令牌；令牌只在后端用于以你的身份发表或编辑自己的社区文章，不发送到网页。会话最长约 8 小时，到期后定期清理；退出登录立即删除当前会话。
+
+浏览器在当前标签页保存不透明的会话标识，在本机保存 Markdown 草稿；草稿在点击发布前不会上传。共享设备上请退出登录并清理不再需要的浏览器站点数据，或先导出自己的草稿。你也可以在 GitHub 的应用设置中撤销社区应用授权。
+
+服务为防止重复发布，短期保存请求标识及结果；对登录来源 IP 做哈希并限流。Cloudflare 和 GitHub 仍按各自政策处理网络请求。本站未添加广告、第三方统计或追踪字体。文章里的外部图片和链接可能向对应服务发送访问请求。
 
 ## 编辑与删除
 
@@ -124,7 +130,7 @@ GitHub 的内容历史、CDN 缓存、搜索引擎和第三方已保存副本不
 
 ## 平台规则
 
-GitHub Pages 和 Discussions 适用 [GitHub 服务条款](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service)及[隐私声明](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)。账号访问、平台可用性和通知由 GitHub 管理。
+GitHub Pages 和 Discussions 适用 [GitHub 服务条款](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service)及[隐私声明](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)。账号访问、平台可用性和通知由 GitHub 管理。授权后端使用 Cloudflare 服务，相关处理见 [Cloudflare 隐私政策](https://www.cloudflare.com/privacypolicy/)。
 ` },
   { slug: 'feedback', title: '一起把这里建好', subtitle: '反馈一个问题、提出一个新方向，或者完善板块结构。', body: `
 ## 新建板块，不用等审批
@@ -133,9 +139,9 @@ GitHub Pages 和 Discussions 适用 [GitHub 服务条款](https://docs.github.co
 
 ## 反馈社区体验
 
-点击下方「提交反馈」，在问题表单的板块栏填写 \`#社区建设\`，说明现象、希望的效果和相关链接。你可以提出板块合并、更名、文章类型调整，以及网站功能建议。
+点击下方「提交反馈」，选择「问题」类型，使用 \`#社区建设\` 板块，说明现象、希望的效果和相关链接。你可以提出板块合并、更名、文章类型调整，以及网站功能建议。
 
-[提交反馈 →](https://github.com/bcm-ins/bcm-ins.github.io/discussions/new?category=q-a)
+[提交反馈 →](/publish/?board=社区建设)
 
 如果是网站源码问题，也可以通过[GitHub Issues](https://github.com/bcm-ins/bcm-ins.github.io/issues)提交；请不要在公开反馈中粘贴令牌、密码或个人隐私。
 ` },

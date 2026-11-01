@@ -27,6 +27,7 @@ jobs:
       discussions: read
     env:
       ASTRO_TELEMETRY_DISABLED: '1'
+      PUBLIC_COMMUNITY_API: ${{ vars.PUBLIC_COMMUNITY_API }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
