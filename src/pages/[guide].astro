@@ -1,0 +1,10 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { guides } from '../lib/guides.mjs';
+import { renderMarkdown } from '../lib/community.mjs';
+export function getStaticPaths() { return guides.map(guide => ({ params: { guide: guide.slug }, props: { guide } })); }
+const { guide } = Astro.props;
+// The guide's boards anchor is authored here; community HTML cannot supply arbitrary ids.
+const content = renderMarkdown(guide.body).replace('<h2>文章开头的 #板块</h2>', '<h2 id="boards">文章开头的 #板块</h2>');
+---
+<Layout title={guide.title} description={guide.subtitle} active="guide"><div class="guide-layout"><div class="page-heading"><span class="eyebrow">COMMUNITY HANDBOOK</span><h1>{guide.title}</h1><p>{guide.subtitle}</p></div><article class="guide-card"><div class="prose" set:html={content}/></article><a href="/publish/" class="text-link">准备好了，发布一篇文章 →</a></div></Layout>

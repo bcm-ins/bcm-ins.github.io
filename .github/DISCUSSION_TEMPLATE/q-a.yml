@@ -1,0 +1,22 @@
+body:
+  - type: input
+    id: boards
+    attributes:
+      label: 板块
+      description: "以 # 开头，空格分隔；/ 表示层级。网站反馈可填 #社区建设。"
+      placeholder: "#相机固件/索尼/a7c2"
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: 问题描述
+      description: "Markdown 正文。描述期望与实际现象，注明完整机型、硬件或软件版本。"
+      placeholder: "## 我遇到的情况\n\n## 机型与版本\n\n## 复现步骤"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 已尝试的方法与资料
+      description: "可添加日志、图片、测试条件、固件或软件链接；去除个人隐私和密钥。"

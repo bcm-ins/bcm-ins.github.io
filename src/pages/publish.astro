@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { types, newTopic } from '../lib/community.mjs';
+---
+<Layout title="发布文章">
+  <div class="page-heading"><span class="eyebrow">SHARE WHAT YOU KNOW</span><h1>写下你的观察。</h1><p>先选文章类型，再在 Markdown 开头添加板块。三种类型都可以使用完整正文、图片、代码和下载链接。</p></div>
+  <div class="publish-note"><span aria-hidden="true">#</span><div><h2>一篇文章，可以属于多个板块。</h2><p>进入编辑器后，在最前面的「板块」字段粘贴标签。新标签会创建新板块，作者随时可以编辑调整。</p><div class="board-copy"><code data-board-example>#相机固件/索尼/a7c2</code><button type="button" data-copy>复制板块标签</button><span role="status" data-copy-status></span></div></div></div>
+  <div class="publish-choices">{types.map(t => <a class="publish-choice" href={newTopic(t.category)}><span class={`type-icon ${t.key}`} aria-hidden="true">{t.symbol}</span><h2>{t.name}</h2><p>{t.description}</p><span class="text-link">在 GitHub 中撰写 ↗</span></a>)}</div>
+  <div class="guide-card"><div class="prose"><h2>熟悉的 Markdown 编辑器</h2><p>点击上方入口会前往 GitHub Discussions。登录后填写表单、预览并发布；已有账号无需在本站重新注册。</p><p>文章正文保存在你的原帖中。网站会自动同步公开内容，通常几分钟后出现；回复、通知、订阅和编辑均在原帖管理。</p><p>普通用户不需要仓库写入权限。固件或软件文件建议放在自己的 GitHub Releases，在正文中链接即可。</p><p><a href="/guide/#boards">板块与类型说明</a> · <a href="/firmware-guide/">固件 / 软件发布指南</a> · <a href="/moderation/">社区公约</a></p></div></div>
+</Layout>
+<script>
+  const board = new URLSearchParams(location.search).get('board');
+  const example = document.querySelector('[data-board-example]');
+  if (board && board.length <= 80 && /^[\p{L}\p{N}_+./-]+$/u.test(board) && example) example.textContent = `#${board}`;
+  document.querySelector('[data-copy]')?.addEventListener('click', async () => {
+    const status = document.querySelector('[data-copy-status]');
+    try { await navigator.clipboard.writeText(example?.textContent || ''); if(status) status.textContent = '已复制'; }
+    catch { if(status) status.textContent = '请选中标签文字手动复制'; }
+  });
+</script>

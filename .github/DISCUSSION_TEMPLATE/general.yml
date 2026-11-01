@@ -1,0 +1,17 @@
+body:
+  - type: input
+    id: boards
+    attributes:
+      label: 板块
+      description: "以 # 开头，空格分隔；/ 表示父子板块。新标签会自动建立新板块。"
+      placeholder: "#相机固件/索尼/a7c2 #软件与工具"
+    validations:
+      required: true
+  - type: textarea
+    id: article
+    attributes:
+      label: 正文
+      description: "使用 Markdown 撰写知识文章，可加入图片、表格、代码、固件和软件链接。"
+      placeholder: "## 观察与结论\n\n## 方法、条件与证据\n\n## 参考资料"
+    validations:
+      required: true

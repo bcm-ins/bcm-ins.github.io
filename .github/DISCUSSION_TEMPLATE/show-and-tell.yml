@@ -1,0 +1,38 @@
+body:
+  - type: input
+    id: boards
+    attributes:
+      label: 板块
+      description: "以 # 开头，空格分隔；一个作品可以同时进入多个板块。"
+      placeholder: "#相机固件/索尼/a7c2 #软件与工具"
+    validations:
+      required: true
+  - type: textarea
+    id: introduction
+    attributes:
+      label: 作品介绍
+      description: "Markdown 正文。介绍项目、版本、变化与使用方法。"
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: 适配范围与验证状态
+      placeholder: "完整机型 / 硬件修订 / 原固件版本 / 操作系统；已测试的条件，或明确注明尚未测试。"
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: 下载、源码与许可
+      description: "建议链接到你自己仓库的 Releases；列出文件名、实际 SHA-256、源码 / 构建说明与分发许可。"
+      placeholder: "[Release](https://github.com/你的账号/项目/releases/tag/版本)\n文件名：\nSHA-256：\n源码：\n许可："
+    validations:
+      required: true
+  - type: textarea
+    id: recovery
+    attributes:
+      label: 安装、回退与已知问题
+      description: "固件请说明备份与恢复方法。非刷写软件可说明卸载方法，其他不适用项写明不适用。"
+    validations:
+      required: true

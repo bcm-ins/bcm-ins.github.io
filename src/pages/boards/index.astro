@@ -1,0 +1,11 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import data from '../../data/community.json';
+import { collectBoards, boardHref } from '../../lib/community.mjs';
+const boards = collectBoards(data.discussions);
+---
+<Layout title="全部板块" active="boards">
+  <div class="page-heading"><span class="eyebrow">FIND YOUR CORNER</span><h1>每个细节，都有讨论的地方。</h1><p>板块可以逐层细分，一篇文章可以出现在多个板块。点击标签，找到同一方向的记录。</p><a href="/guide/#boards" class="text-link">创建或修改板块 →</a></div>
+  <section class="board-directory" aria-label="全部板块">{boards.map(b => <a href={boardHref(b.name)} style={`--depth:${Math.min(b.depth, 4)}`} class="directory-row"><span class="directory-hash">#</span><span><b>{b.name.replaceAll('/', ' / ')}</b><small>{b.depth ? `属于 ${b.name.split('/').slice(0,-1).join(' / ')}` : '一级板块'}</small></span><span class="directory-count">{b.count} 篇文章</span><span aria-hidden="true">↗</span></a>)}</section>
+  <p class="snapshot-note">板块来自文章开头的标签。子板块文章会同时出现在上级板块；没有文章的自建板块会随标签移除而消失。预设入口保留。</p>
+</Layout>

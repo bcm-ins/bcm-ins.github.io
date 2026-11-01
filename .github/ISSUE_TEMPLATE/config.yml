@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 社区文章与问题
+    url: https://github.com/bcm-ins/bcm-ins.github.io/discussions
+    about: 文章、硬件问题和固件发布请使用 Discussions；Issues 用于网站本身的问题。

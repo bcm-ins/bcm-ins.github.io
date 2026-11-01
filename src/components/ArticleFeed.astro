@@ -1,0 +1,64 @@
+---
+import { types, typeFor, boardHref, formatDate } from '../lib/community.mjs';
+const { discussions, emptyTitle = '这里还没有文章', emptyDescription = '分享第一份观察、提出一个问题，或发布你的作品。' } = Astro.props;
+---
+<section class="feed" aria-label="文章列表" data-feed>
+  <div class="feed-toolbar">
+    <div class="type-tabs" role="group" aria-label="文章类型筛选"><button class="active" type="button" data-type="all" aria-pressed="true">全部</button>{types.map(t => <button type="button" data-type={t.key} aria-pressed="false">{t.key === 'release' ? '发布' : t.name}</button>)}</div>
+    <label class="sort-label"><span class="sr-only">文章排序</span><select aria-label="文章排序" data-sort><option value="activity">最近活跃</option><option value="newest">最新发布</option><option value="replies">最多回复</option></select></label>
+  </div>
+  <div class="search-row"><label class="search-box"><span aria-hidden="true">⌕</span><input type="search" placeholder="搜索文章、作者或 #板块" aria-label="搜索文章、作者或板块" data-search autocomplete="off" /></label><span class="result-count" data-count aria-live="polite">{discussions.length} 篇文章</span></div>
+  <div class="article-list" data-list>
+    {discussions.map(d => {
+      const type = typeFor(d.type);
+      return <article class="article-row" data-row data-kind={d.type} data-search-text={`${d.title} ${d.excerpt} ${d.author} ${d.boards.join(' ')}`.toLocaleLowerCase()} data-activity={d.updatedAt} data-newest={d.createdAt} data-replies={d.comments}>
+        <a href={`/posts/${d.number}/`} class={`type-icon ${d.type}`} title={type.name} aria-label={type.name}><span aria-hidden="true">{type.symbol}</span></a>
+        <div class="article-main">
+          <div class="article-boards">{d.explicitBoards.length ? d.explicitBoards.slice(0, 4).map(b => <a href={boardHref(b)} class="tag" title={b}>#{b.replaceAll('/', ' / ')}</a>) : <span class="tag neutral">未指定板块</span>}{d.explicitBoards.length > 4 && <span class="tag neutral">＋{d.explicitBoards.length - 4}</span>}</div>
+          <h2><a href={`/posts/${d.number}/`}>{d.title}</a>{d.answered && <span class="answer-badge">已解答</span>}{d.locked && <span class="state-badge">已锁定</span>}{d.closed && <span class="state-badge">已关闭</span>}</h2>
+          <p class="excerpt">{d.excerpt.replace(/^板块(?:（.*?）)?\s*(?:#[^\s]+\s*)+/, '').replace(/^正文\s*/, '')}</p>
+          <div class="article-meta"><span class="author-avatar" aria-hidden="true">{d.author.slice(0,1).toUpperCase()}</span><span>{d.author}</span><span class="meta-dot">·</span><span>{type.name}</span><span class="meta-dot">·</span><time datetime={d.updatedAt} title={new Date(d.updatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Taipei' })}>{formatDate(d.updatedAt)}活跃</time></div>
+        </div>
+        <a class="reply-count" href={`${d.url}#discussioncomment`} aria-label={`${d.comments} 条回复，前往 GitHub 讨论`}><span aria-hidden="true">◌</span><strong>{d.comments}</strong><small>回复</small></a>
+      </article>;
+    })}
+  </div>
+  <div class="empty-state" data-empty hidden={discussions.length > 0}><span aria-hidden="true">◇</span><h3>{emptyTitle}</h3><p>{emptyDescription}</p><a href="/publish/" class="text-link">发布第一篇文章 →</a></div>
+  <div class="no-results" data-no-results hidden><h3>没有找到匹配的文章</h3><p>试试更短的关键词，或切换到“全部”。</p><button class="button secondary" type="button" data-reset>清除筛选</button></div>
+  <button class="load-more" data-more hidden type="button">加载更多文章 ↓</button>
+</section>
+<script>
+  const feed = document.querySelector('[data-feed]');
+  if (feed instanceof HTMLElement) {
+    const search = feed.querySelector('[data-search]') as HTMLInputElement;
+    const sort = feed.querySelector('[data-sort]') as HTMLSelectElement;
+    const list = feed.querySelector('[data-list]') as HTMLElement;
+    const rows = [...feed.querySelectorAll<HTMLElement>('[data-row]')];
+    const buttons = [...feed.querySelectorAll<HTMLButtonElement>('[data-type]')];
+    const params = new URLSearchParams(location.search);
+    let selectedType = ['article', 'question', 'release'].includes(params.get('type') || '') ? params.get('type')! : 'all';
+    let limit = 20;
+    search.value = params.get('q') || '';
+    function render() {
+      const query = search.value.trim().toLocaleLowerCase().replaceAll('#', '');
+      const matches = rows.filter(row => (selectedType === 'all' || row.dataset.kind === selectedType) && query.split(/\s+/).every(word => (row.dataset.searchText || '').includes(word)));
+      matches.sort((a,b) => sort.value === 'replies' ? Number(b.dataset.replies) - Number(a.dataset.replies) : (b.dataset[sort.value] || '').localeCompare(a.dataset[sort.value] || ''));
+      rows.forEach(row => row.hidden = true);
+      matches.forEach((row, i) => { list.append(row); row.hidden = i >= limit; });
+      buttons.forEach(btn => { const current = btn.dataset.type === selectedType; btn.classList.toggle('active', current); btn.setAttribute('aria-pressed', String(current)); });
+      (feed!.querySelector('[data-count]') as HTMLElement).textContent = `${matches.length} 篇文章`;
+      (feed!.querySelector('[data-no-results]') as HTMLElement).hidden = matches.length !== 0 || rows.length === 0;
+      (feed!.querySelector('[data-more]') as HTMLElement).hidden = matches.length <= limit;
+      const updated = new URL(location.href);
+      selectedType === 'all' ? updated.searchParams.delete('type') : updated.searchParams.set('type', selectedType);
+      search.value.trim() ? updated.searchParams.set('q', search.value.trim()) : updated.searchParams.delete('q');
+      history.replaceState(null, '', updated);
+    }
+    buttons.forEach(btn => btn.addEventListener('click', () => { selectedType = btn.dataset.type!; limit = 20; render(); }));
+    search.addEventListener('input', () => { limit = 20; render(); });
+    sort.addEventListener('change', render);
+    feed.querySelector('[data-more]')?.addEventListener('click', () => { limit += 20; render(); });
+    feed.querySelector('[data-reset]')?.addEventListener('click', () => { selectedType = 'all'; search.value = ''; limit = 20; render(); search.focus(); });
+    render();
+  }
+</script>

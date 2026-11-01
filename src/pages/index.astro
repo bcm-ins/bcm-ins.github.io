@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ArticleFeed from '../components/ArticleFeed.astro';
+import data from '../data/community.json';
+import { boardHref } from '../lib/community.mjs';
+const authors = new Set(data.discussions.map(d => d.author));
+---
+<Layout>
+  <section class="hero">
+    <div class="hero-copy"><span class="eyebrow">CAMERA INTERNALS / OPEN COMMUNITY</span><h1>关于相机，<br />继续往里看<span class="hero-period">。</span></h1><p>从一枚传感器到一行固件。<br />把观察写成文章，把问题交给社区。</p><div class="hero-links"><a href="/publish/" class="button">分享你的发现 <span aria-hidden="true">↗</span></a><a href="/guide/" class="quiet-link">初来这里？</a></div></div>
+    <div class="camera-figure" aria-hidden="true">
+      <svg viewBox="0 0 360 230" fill="none"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" stroke="currentColor" stroke-width=".5" opacity=".14"/></pattern></defs><rect width="360" height="230" fill="url(#grid)"/><path d="M59 79h57l14-22h76l16 22h62q14 0 14 14v93q0 13-14 13H59q-14 0-14-13V93q0-14 14-14Z" stroke="currentColor" stroke-width="1.5"/><rect x="64" y="66" width="29" height="13" rx="3" stroke="currentColor"/><rect x="250" y="95" width="28" height="16" rx="2" stroke="currentColor"/><circle cx="172" cy="137" r="61" stroke="currentColor" stroke-dasharray="3 5"/><circle cx="172" cy="137" r="48" stroke="currentColor" stroke-width="1.5"/><circle cx="172" cy="137" r="35" stroke="currentColor"/><path d="m172 103 29 17v34l-29 17-29-17v-34zM172 103l-13 35 42-18M201 154l-37-6 8 23M143 154l23-28-23-6" stroke="currentColor"/><path d="M172 57V21H251M285 137h43v43M45 156H20v-41" stroke="currentColor" opacity=".5"/><circle cx="251" cy="21" r="3" fill="currentColor"/><circle cx="328" cy="180" r="3" fill="currentColor"/><text x="199" y="15" fill="currentColor" font-size="8" font-family="monospace">HARDWARE × FIRMWARE</text><text x="237" y="219" fill="currentColor" font-size="8" font-family="monospace">EXPLORE WHAT'S INSIDE</text><path d="M63 96h28M63 103h17M274 174h12M280 168v12" stroke="currentColor"/></svg>
+      <span class="figure-label">FIELD NOTES <span>001 — ∞</span></span>
+    </div>
+  </section>
+  <div class="content-columns">
+    <div class="feed-column"><div class="section-heading"><h2>社区文章</h2><a href="/boards/">按板块浏览 ↗</a></div><ArticleFeed discussions={data.discussions} /><p class="snapshot-note">更新于 {new Date(data.generatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Taipei', hour12: false })}（台北时间）。<a href="https://github.com/bcm-ins/bcm-ins.github.io/discussions">查看实时讨论 ↗</a></p></div>
+    <aside class="right-rail" aria-label="社区介绍">
+      <section class="welcome-panel"><div class="panel-kicker">很高兴在这里遇见你</div><h2>有 GitHub，<br />就能一起参与。</h2><p>用已有账号发表 Markdown 文章、回复和订阅讨论。无需在本站重复注册。</p><a class="button secondary full" href="/publish/">开始第一篇文章 ↗</a></section>
+      <section class="rail-section"><h3>从这里开始 <span>↙</span></h3><a class="board-feature" href={boardHref('相机固件')}><span class="board-feature-icon">#</span><span><b>相机固件</b><small>从版本差异，到自己的实现</small></span></a><a class="board-feature" href={boardHref('相机固件/索尼')}><span class="board-feature-icon blue">#</span><span><b>索尼</b><small>机型研究与固件记录</small></span></a><a class="board-feature" href={boardHref('相机固件/索尼/a7c2')}><span class="board-feature-icon amber">#</span><span><b>索尼 a7c2</b><small>一个机型，一份长期笔记</small></span></a></section>
+      <section class="rail-section reading-links"><h3>社区手册</h3><a href="/guide/#boards">用 #标签创建自己的板块 <span>↗</span></a><a href="/firmware-guide/">如何发布固件 / 软件 <span>↗</span></a><a href="/moderation/">讨论公约与管理方式 <span>↗</span></a><a href="/feedback/">把社区做得更好 <span>↗</span></a></section>
+      <div class="community-numbers"><span><b>{data.totalCount}</b>公开文章</span><span><b>{authors.size}</b>发文作者</span></div><p class="rail-footnote">社区刚刚起步。这里的数字来自真实讨论，期待你的第一份记录。</p>
+    </aside>
+  </div>
+</Layout>

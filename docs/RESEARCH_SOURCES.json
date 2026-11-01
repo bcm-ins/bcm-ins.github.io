@@ -1,0 +1,201 @@
+{
+  "checked_on": "2026-11-02",
+  "method": "GitHub REST repository metadata and current default-branch README; not production installation tests",
+  "projects": [
+    {
+      "full_name": "debiki/talkyard",
+      "html_url": "https://github.com/debiki/talkyard",
+      "readme_url": "https://github.com/debiki/talkyard/blob/main/README.md",
+      "description": "A community discussion platform: Brings together the main features from StackOverflow, Slack, Discourse, Reddit, and Disqus blog comments.",
+      "pushed_at": "2026-07-13T10:31:41Z",
+      "archived": false,
+      "license": {
+        "key": "agpl-3.0",
+        "name": "GNU Affero General Public License v3.0",
+        "spdx_id": "AGPL-3.0",
+        "url": "https://api.github.com/licenses/agpl-3.0",
+        "node_id": "MDc6TGljZW5zZTE="
+      }
+    },
+    {
+      "full_name": "discourse/discourse",
+      "html_url": "https://github.com/discourse/discourse",
+      "readme_url": "https://github.com/discourse/discourse/blob/main/README.md",
+      "description": "A platform for community discussion. Free, open, simple.",
+      "pushed_at": "2026-10-31T19:46:06Z",
+      "archived": false,
+      "license": {
+        "key": "gpl-2.0",
+        "name": "GNU General Public License v2.0",
+        "spdx_id": "GPL-2.0",
+        "url": "https://api.github.com/licenses/gpl-2.0",
+        "node_id": "MDc6TGljZW5zZTg="
+      }
+    },
+    {
+      "full_name": "meta/docusaurus",
+      "html_url": "https://github.com/meta/docusaurus",
+      "readme_url": "https://github.com/meta/docusaurus/blob/main/README.md",
+      "description": "Easy to maintain open source documentation websites.",
+      "pushed_at": "2026-10-30T20:39:07Z",
+      "archived": false,
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "flarum/framework",
+      "html_url": "https://github.com/flarum/framework",
+      "readme_url": "https://github.com/flarum/framework/blob/2.x/README.md",
+      "description": "Simple forum software for building great communities.",
+      "pushed_at": "2026-11-01T16:50:23Z",
+      "archived": false,
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "giscus/giscus",
+      "html_url": "https://github.com/giscus/giscus",
+      "readme_url": "https://github.com/giscus/giscus/blob/main/README.md",
+      "description": "A commenting system powered by GitHub Discussions. :octocat: :speech_balloon: :gem:",
+      "pushed_at": "2026-05-26T22:20:10Z",
+      "archived": false,
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "gitalk/gitalk",
+      "html_url": "https://github.com/gitalk/gitalk",
+      "readme_url": "https://github.com/gitalk/gitalk/blob/main/readme.md",
+      "description": "Gitalk — a comment component based on GitHub Discussions (current, 2.x). The GitHub Issues based 1.x line is end-of-life.",
+      "pushed_at": "2026-10-19T11:39:53Z",
+      "archived": false,
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "gohugoio/hugo",
+      "html_url": "https://github.com/gohugoio/hugo",
+      "readme_url": "https://github.com/gohugoio/hugo/blob/master/README.md",
+      "description": "The world’s fastest framework for building websites.",
+      "pushed_at": "2026-10-30T18:58:58Z",
+      "archived": false,
+      "license": {
+        "key": "apache-2.0",
+        "name": "Apache License 2.0",
+        "spdx_id": "Apache-2.0",
+        "url": "https://api.github.com/licenses/apache-2.0",
+        "node_id": "MDc6TGljZW5zZTI="
+      }
+    },
+    {
+      "full_name": "hexojs/hexo",
+      "html_url": "https://github.com/hexojs/hexo",
+      "readme_url": "https://github.com/hexojs/hexo/blob/master/README.md",
+      "description": "A fast, simple & powerful blog framework, powered by Node.js.",
+      "pushed_at": "2026-10-26T23:52:47Z",
+      "archived": false,
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "imsun/gitment",
+      "html_url": "https://github.com/imsun/gitment",
+      "readme_url": "https://github.com/imsun/gitment/blob/master/README.md",
+      "description": "A comment system based on GitHub Issues.",
+      "pushed_at": "2021-10-05T06:10:40Z",
+      "archived": false,
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "Meekdai/Gmeek",
+      "html_url": "https://github.com/Meekdai/Gmeek",
+      "readme_url": "https://github.com/Meekdai/Gmeek/blob/main/README.md",
+      "description": "Gmeek is a Blog All in Github",
+      "pushed_at": "2026-02-05T05:27:15Z",
+      "archived": false,
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "NodeBB/NodeBB",
+      "html_url": "https://github.com/NodeBB/NodeBB",
+      "readme_url": "https://github.com/NodeBB/NodeBB/blob/master/README.md",
+      "description": "Node.js based forum software built for the modern web",
+      "pushed_at": "2026-11-01T16:44:30Z",
+      "archived": false,
+      "license": {
+        "key": "gpl-3.0",
+        "name": "GNU General Public License v3.0",
+        "spdx_id": "GPL-3.0",
+        "url": "https://api.github.com/licenses/gpl-3.0",
+        "node_id": "MDc6TGljZW5zZTk="
+      }
+    },
+    {
+      "full_name": "utterance/utterances",
+      "html_url": "https://github.com/utterance/utterances",
+      "readme_url": "https://github.com/utterance/utterances/blob/master/README.md",
+      "description": ":crystal_ball: A lightweight comments widget built on GitHub issues",
+      "pushed_at": "2024-08-15T15:04:06Z",
+      "archived": false,
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "withastro/astro",
+      "html_url": "https://github.com/withastro/astro",
+      "readme_url": "https://github.com/withastro/astro/blob/main/README.md",
+      "description": "The web framework for content-driven websites.",
+      "pushed_at": "2026-10-30T20:16:32Z",
+      "archived": false,
+      "license": {
+        "key": "other",
+        "name": "Other",
+        "spdx_id": "NOASSERTION",
+        "url": null,
+        "node_id": "MDc6TGljZW5zZTA="
+      }
+    }
+  ]
+}

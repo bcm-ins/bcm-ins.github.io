@@ -1,0 +1,18 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ArticleFeed from '../../components/ArticleFeed.astro';
+import data from '../../data/community.json';
+import { collectBoards, boardHref, boardName } from '../../lib/community.mjs';
+export function getStaticPaths() { return collectBoards(data.discussions).map(board => ({ params: { id: board.id }, props: { board } })); }
+const { board } = Astro.props;
+const parts = board.name.split('/');
+const children = collectBoards(data.discussions).filter(b => b.name.startsWith(board.name + '/') && b.depth === board.depth + 1);
+const posts = data.discussions.filter(d => d.boards.includes(board.name));
+---
+<Layout title={`#${board.name}`} active="boards" activeBoard={board.name}>
+  <nav class="breadcrumbs" aria-label="板块层级"><a href="/boards/">板块</a>{parts.map((p,i) => <><span>/</span><a href={boardHref(parts.slice(0,i+1).join('/'))} aria-current={i === parts.length - 1 ? 'page' : undefined}>{p}</a></>)}</nav>
+  <header class="board-header"><div><span class="eyebrow">COMMUNITY BOARD</span><h1><span class="hash">#</span> {boardName(board.name)}</h1><p>分享知识、讨论问题、发布作品。此处汇集本板块及其子板块的文章。</p></div><a class="button" href={`/publish/?board=${encodeURIComponent(board.name)}`}>＋ 在此发布</a></header>
+  {children.length > 0 && <div class="subboards"><span>子板块</span>{children.map(b => <a class="tag" href={boardHref(b.name)}>#{boardName(b.name)} <small>{b.count}</small></a>)}</div>}
+  <ArticleFeed discussions={posts} emptyTitle={`#${boardName(board.name)} 等你落笔`} emptyDescription="可以先分享一份机型观察、一个未解问题，或你正在开发的固件与软件。" />
+  <p class="snapshot-note">发布时在文章开头填写 <code>#{board.name}</code>。新的文章和标签会在站点同步后出现。</p>
+</Layout>
