@@ -1,0 +1,17 @@
+---
+import {boardHref, boardName, popularSubboards} from '../lib/community.mjs';
+const {boards, discussions, generatedAt, activeBoard=''}=Astro.props;
+const popular=popularSubboards(boards,discussions,generatedAt);
+---
+<section class="sidebar-boards" aria-label="板块导航">
+  <div class="sidebar-heading" title="根据文章、回复和点赞计算，活跃度随时间衰减"><span class="boards-expand-label">热门板块</span><span class="boards-collapse-label">全部板块</span></div>
+  <div class="sidebar-group popular-boards">
+    {popular.map(b=><a class:list={['side-link',{selected:b.name===activeBoard}]} href={boardHref(b.name)} title={b.name} aria-current={b.name===activeBoard?'page':undefined}><span class="hash" aria-hidden="true">#</span><span class="popular-board-name"><span>{boardName(b.name)}</span>{b.depth>0&&<small>{b.name.split('/').slice(0,-1).join(' / ')}</small>}</span><span class="tiny-count" aria-label={`${b.count} 篇文章`}>{b.count}</span></a>)}
+  </div>
+  <details class="sidebar-board-expander">
+    <summary><span class="boards-expand-label">全部板块</span><span class="boards-collapse-label">收起板块</span><svg class="board-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+    <div class="sidebar-group board-tree all-sidebar-boards">
+      {boards.map(b=><a class:list={['side-link',{selected:b.name===activeBoard}]} style={`--depth:${Math.min(b.depth,3)}`} href={boardHref(b.name)} title={b.name} aria-current={b.name===activeBoard?'page':undefined}><span class="hash" aria-hidden="true">#</span><span class="board-name">{boardName(b.name)}</span><span class="tiny-count" aria-label={`${b.count} 篇文章`}>{b.count}</span></a>)}
+    </div>
+  </details>
+</section>

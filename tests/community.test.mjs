@@ -1,7 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { renderMarkdown, normalizeDiscussion, safeGithubUrl, parseBoards, collectBoards } from '../src/lib/community.mjs';
+import { renderMarkdown, normalizeDiscussion, safeGithubUrl, parseBoards, collectBoards, popularSubboards } from '../src/lib/community.mjs';
 import { collectDiscussions } from '../scripts/sync-discussions.mjs';
+
+test('Sidebar ranks up to six children by decayed activity without letting parent aggregates crowd them out',()=>{
+  const boards=[{name:'root',depth:0,count:1000},...Array.from({length:8},(_,i)=>({name:`root/child${i}`,depth:1,count:1}))];
+  const posts=boards.slice(1).map((b,i)=>({boards:['root',b.name],comments:i,upvotes:0,updatedAt:'2026-11-02T00:00:00Z'}));
+  posts[0]={...posts[0],comments:100,updatedAt:'2023-01-01T00:00:00Z'};
+  const ranked=popularSubboards(boards,posts,'2026-11-02T00:00:00Z');assert.equal(ranked.length,6);assert.equal(ranked[0].name,'root/child7');assert.equal(ranked.some(b=>b.depth===0||b.name==='root/child0'),false);
+  assert.deepEqual(popularSubboards([],[],'2026-11-02'),[]);assert.equal(popularSubboards(boards.slice(0,2),posts,'2026-11-02').length,1);
+});
 
 test('Untrusted article content cannot inject executable HTML or unsafe links', () => {
   const html = renderMarkdown('<script>alert(1)</script><img src="https://example.com/a.png" onerror="alert(2)"><a href="javascript:alert(3)">x</a><iframe src="https://example.com"></iframe><form><input type="password" name="token"></form><svg onload="alert(4)"></svg>');

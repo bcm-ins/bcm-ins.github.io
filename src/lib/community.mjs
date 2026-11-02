@@ -24,6 +24,21 @@ export function collectBoards(discussions) {
   const rank = (name) => { const index = roots.indexOf(name.split('/')[0]); return index < 0 ? roots.length : index; };
   return [...names].map((name) => ({ name, id: boardId(name), depth: name.split('/').length - 1, count: discussions.filter((d) => d.boards.includes(name)).length })).sort((a,b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name, 'zh-CN'));
 }
+
+export function popularSubboards(boards, discussions, generatedAt) {
+  const reference = Date.parse(generatedAt) || 0;
+  const scores = new Map();
+  for (const post of discussions) {
+    const updated = Date.parse(post.updatedAt) || 0;
+    const ageDays = Math.max(0, reference - updated) / 86400000;
+    const score = (1 + 2 * Math.max(0, Number(post.comments) || 0) + Math.max(0, Number(post.upvotes) || 0)) / (1 + ageDays / 7);
+    for (const name of new Set(post.boards)) scores.set(name, (scores.get(name) || 0) + score);
+  }
+  const children = boards.filter(board => board.depth > 0);
+  return [...(children.length ? children : boards)].sort((a, b) =>
+    (scores.get(b.name) || 0) - (scores.get(a.name) || 0) || b.count - a.count || a.name.localeCompare(b.name, 'zh-CN')
+  ).slice(0, 6);
+}
 export const newTopic = (slug = '') => `${github}/discussions/new${slug ? `?category=${encodeURIComponent(slug)}` : ''}`;
 export const formatDate = (value) => new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Taipei', month: 'short', day: 'numeric' }).format(new Date(value));
 

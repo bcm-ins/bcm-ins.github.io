@@ -5,10 +5,10 @@ import '../styles/community.css';
 import '../styles/markdown-editor.css';
 import data from '../data/community.json';
 import Icon from '../components/Icon.astro';
-import { github, collectBoards, boardHref, boardName } from '../lib/community.mjs';
+import SidebarBoards from '../components/SidebarBoards.astro';
+import { github, collectBoards } from '../lib/community.mjs';
 const { title = '相机硬件交流社区', description = 'cam-ins 相机硬件社区：知识文章、问题与解答、固件和软件发布。', activeBoard = '', active = 'feed' } = Astro.props;
 const boards = collectBoards(data.discussions);
-const sidebarBoards = boards.filter(b => b.depth === 0 || b.name.startsWith('相机固件/')).slice(0, 14);
 const apiUrl = import.meta.env.PUBLIC_COMMUNITY_API || '';
 const apiOrigin = apiUrl ? new URL(apiUrl).origin : '';
 ---
@@ -46,11 +46,7 @@ const apiOrigin = apiUrl ? new URL(apiUrl).origin : '';
           <a class="side-link" href="/?type=release"><Icon name="release" size={18}/>固件 / 软件</a>
           <a class:list={['side-link',{selected:active==='profile'}]} href="/u/"><Icon name="user" size={18}/>个人中心</a>
         </div>
-        <div class="sidebar-heading">浏览板块<a href="/boards/" aria-label="查看全部板块"><Icon name="arrow" size={15}/></a></div>
-        <div class="sidebar-group board-tree">
-          {sidebarBoards.map(b => <a class:list={['side-link', { selected: b.name === activeBoard }]} style={`--depth:${Math.min(b.depth, 3)}`} href={boardHref(b.name)} title={b.name}><span class="hash" aria-hidden="true">#</span><span class="board-name">{boardName(b.name)}</span><span class="tiny-count">{b.count}</span></a>)}
-          <a class="side-link muted" href="/boards/">所有板块 <Icon name="arrow" size={15}/></a>
-        </div>
+        <SidebarBoards boards={boards} discussions={data.discussions} generatedAt={data.generatedAt} activeBoard={activeBoard}/>
         <div class="sidebar-heading">社区管理</div>
         <div class="sidebar-group"><a class="side-link" href="/guide/#boards"><Icon name="plus" size={18}/>创建 / 调整板块</a><a class="side-link" href="/feedback/"><Icon name="message" size={18}/>建议与反馈</a><a class="side-link" href="/moderation/"><Icon name="shield" size={18}/>社区公约</a></div>
         <div class="sidebar-note"><a href="/privacy/">公开内容与隐私</a><span> · </span><a href={github}>站点源码 ↗</a></div>
