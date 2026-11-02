@@ -53,7 +53,7 @@ export function mountMarkdownEditor(textarea){
     }catch(e){report(`${file.name}：${e.name==='TimeoutError'?'上传超时，可重新选择；相同图片不会重复占用存储。':e.message}`,true);break;}}}
     finally{uploading=false;setDisabled(disabled);root.dispatchEvent(new CustomEvent('md-upload-state',{bubbles:true,detail:{busy:false}}));}
   }
-  function setDisabled(value){disabled=!!value;view.dispatch({effects:editable.reconfigure([EditorView.editable.of(!disabled),EditorState.readOnly.of(disabled)])});root.querySelectorAll('button,input').forEach(b=>b.disabled=disabled);}
+  function setDisabled(value){disabled=!!value;const locked=disabled||uploading;view.dispatch({effects:editable.reconfigure([EditorView.editable.of(!locked),EditorState.readOnly.of(locked)])});root.querySelectorAll('button,input').forEach(b=>b.disabled=locked);}
   repaint();
   return {sync,focus(){if(viewMode==='preview')mode('write');view.focus();},setDisabled,get uploading(){return uploading;},preview(){mode(viewMode==='preview'?'write':'preview');},destroy(){view.destroy();}};
 }
