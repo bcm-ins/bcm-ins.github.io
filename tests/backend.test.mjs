@@ -7,12 +7,39 @@ import { validateArticle } from '../src/lib/boards.mjs';
 
 function db() {
   const sql=new DatabaseSync(':memory:');sql.exec(readFileSync(new URL('../backend/migrations/0001_sessions.sql',import.meta.url),'utf8'));
-  return {prepare(query){let args=[];return{bind(...values){args=values;return this;},async first(){return sql.prepare(query).get(...args)||null;},async run(){return sql.prepare(query).run(...args);}};},async batch(queries){return Promise.all(queries.map(q=>q.run()));},sql};
+  sql.exec(readFileSync(new URL('../backend/migrations/0002_images.sql',import.meta.url),'utf8'));
+  return {prepare(query){let args=[];return{bind(...values){args=values.map(v=>v instanceof ArrayBuffer?new Uint8Array(v):v);return this;},async first(){return sql.prepare(query).get(...args)||null;},async run(){return sql.prepare(query).run(...args);}};},async batch(queries){return Promise.all(queries.map(q=>q.run()));},sql};
 }
 const envFor=()=>({DB:db(),SITE_ORIGIN:'https://bcm-ins.github.io',REPOSITORY:'bcm-ins/bcm-ins.github.io',REPOSITORY_ID:'repo-test',CATEGORY_ARTICLE:'article-test',CATEGORY_QUESTION:'question-test',CATEGORY_RELEASE:'release-test',GITHUB_CLIENT_ID:'test-client',GITHUB_CLIENT_SECRET:'test-secret',TOKEN_ENCRYPTION_KEY:random()});
 function request(path,{method='GET',body,token,origin='https://bcm-ins.github.io'}={}){return new Request('https://community.example'+path,{method,headers:{Origin:origin,...(body?{'Content-Type':'application/json'}:{}),...(token?{Authorization:`Bearer ${token}`}:{})},body:body?JSON.stringify(body):undefined});}
 async function authenticated(env){const token=random();await env.DB.prepare('INSERT INTO sessions VALUES(?,?,?,?,?)').bind(await hash(token),await seal('github-user-secret',env.TOKEN_ENCRYPTION_KEY),'alice',123,Math.floor(Date.now()/1000)+3600).run();return token;}
 const article={title:'传感器记录',body:'## 观察\n\n记录与链接。',type:'article',boards:['相机固件/索尼/a7c2','软件与工具'],requestId:'request_12345678901234567890'};
+
+const png=Uint8Array.from(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64'));
+const imageRequest=(token,bytes=png,mime='image/png',origin='https://bcm-ins.github.io')=>new Request('https://community.example/images',{method:'POST',headers:{Origin:origin,'Content-Type':mime,...(token?{Authorization:`Bearer ${token}`}:{})},body:bytes});
+test('Image upload requires an active session and origin, deduplicates bytes and serves public images safely',async()=>{
+  const env=envFor(),token=await authenticated(env),originalFetch=globalThis.fetch;
+  globalThis.fetch=async()=>new Response(JSON.stringify({data:{viewer:{login:'alice'}}}));
+  try{
+    assert.equal((await worker.fetch(imageRequest(null),env)).status,401);
+    assert.equal((await worker.fetch(imageRequest(token,png,'image/png','https://foreign.example'),env)).status,403);
+    const first=await worker.fetch(imageRequest(token),env);assert.equal(first.status,201);const result=await first.json();assert.match(result.url,/\/images\/[a-f0-9]{64}$/);
+    assert.deepEqual(await (await worker.fetch(imageRequest(token),env)).json(),result);assert.equal(env.DB.sql.prepare('SELECT COUNT(*) n FROM images').get().n,1);
+    const image=await worker.fetch(new Request(result.url),env);assert.equal(image.status,200);assert.equal(image.headers.get('content-type'),'image/png');assert.equal(image.headers.get('x-content-type-options'),'nosniff');assert.match(image.headers.get('content-security-policy'),/sandbox/);assert.deepEqual(new Uint8Array(await image.arrayBuffer()),png);
+    const head=await worker.fetch(new Request(result.url,{method:'HEAD'}),env);assert.equal(head.status,200);assert.equal(await head.text(),'');
+    assert.equal((await worker.fetch(new Request('https://community.example/images/'+'0'.repeat(64)),env)).status,404);
+  }finally{globalThis.fetch=originalFetch;}
+});
+test('Image endpoint rejects active formats, spoofed MIME, oversized bodies, expired grants and storage exhaustion',async()=>{
+  const env=envFor(),token=await authenticated(env),originalFetch=globalThis.fetch;
+  try{
+    for(const [bytes,mime,expected] of [[new TextEncoder().encode('<svg onload="alert(1)"></svg>'),'image/svg+xml',415],[png,'image/jpeg',415],[new Uint8Array(1048577),'image/png',413]])assert.equal((await worker.fetch(imageRequest(token,bytes,mime),env)).status,expected);
+    globalThis.fetch=async()=>new Response('{}',{status:401});assert.equal((await worker.fetch(imageRequest(token),env)).status,401);
+    globalThis.fetch=async()=>new Response(JSON.stringify({data:{viewer:{login:'alice'}}}));
+    for(let i=0;i<32;i++)env.DB.sql.prepare('INSERT INTO images VALUES(?,?,?,?,?,?)').run(String(i),123,'image/png',1048576,png,1);
+    assert.equal((await worker.fetch(imageRequest(token),env)).status,507);
+  }finally{globalThis.fetch=originalFetch;}
+});
 
 test('Article payload validates hierarchy, lengths and enum without executing Markdown',()=>{
   assert.match(validateArticle(article).markdown,/^#相机固件\/索尼\/a7c2 #软件与工具\n/);

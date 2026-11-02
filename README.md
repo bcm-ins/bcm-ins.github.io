@@ -50,6 +50,7 @@ pnpm build
 - [社区公约](CODE_OF_CONDUCT.md)
 - [启动讨论记录](docs/LAUNCH_DISCUSSIONS.json)
 - [授权后端部署与维护](docs/OAUTH_BACKEND.md)
+- [Markdown 编辑器、图片上传与存储](docs/EDITOR_IMAGES.md)
 - 作者可在本站或 GitHub 编辑原文与板块；类型由 GitHub 分类决定，分类/置顶/锁定等操作遵循 GitHub 权限。
 - 当前为个人仓库，维护者 bcm-ins。未创建其他版主账号，不宣称具备组织的独立 triage 权限。
 - 网站问题通过 Issues 或 #社区建设 反馈。准备组织化、多版主或站内完整论坛时，先评估 Discourse / Flarum / NodeBB 的独立托管。

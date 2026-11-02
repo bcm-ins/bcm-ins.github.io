@@ -6,8 +6,9 @@ import {build} from 'esbuild';
 const compiled=new Map();
 async function launch(script,html,url='https://bcm-ins.github.io/posts/8/'){
   if(!compiled.has(script))compiled.set(script,(await build({entryPoints:[script],bundle:true,write:false,format:'iife',platform:'browser',logLevel:'silent'})).outputFiles[0].text);
-  const w=new JSDOM(`<meta name="cam-ins-api" content="https://api.example">${html}`,{url,runScripts:'outside-only'}).window;w.confirm=()=>true;
+  const w=new JSDOM(`<meta name="cam-ins-api" content="https://api.example">${html}`,{url,runScripts:'outside-only',pretendToBeVisual:true}).window;w.confirm=()=>true;
   Object.defineProperty(w,'crypto',{value:webcrypto});w.TextEncoder=TextEncoder;w.AbortSignal=AbortSignal;w.HTMLElement.prototype.scrollIntoView=()=>{};
+  w.Range.prototype.getClientRects=()=>[];w.Range.prototype.getBoundingClientRect=()=>({left:0,right:0,top:0,bottom:0});
   return {w,start(){w.eval(compiled.get(script));}};
 }
 async function until(check){for(let i=0;i<60;i++){if(check())return;await new Promise(r=>setTimeout(r,10));}throw Error('UI did not reach expected state');}
@@ -51,4 +52,20 @@ test('Profile API failure is labelled as a snapshot, never as successfully loade
   const {w,start}=await launch('src/scripts/profile.mjs',profileHTML,'https://bcm-ins.github.io/u/?user=bob');signedIn(w);
   w.fetch=async url=>String(url).startsWith('/api/')?new Response(JSON.stringify({generatedAt:'2026-11-01',posts:[],users:[],replies:[]})):new Response(JSON.stringify({error:'服务暂不可用'}),{status:502});
   try{start();await until(()=>w.document.querySelector('[data-profile-status]').textContent.includes('快照'));assert.equal(w.document.querySelector('[data-profile-tab="drafts"]').hidden,true);assert.doesNotMatch(w.document.querySelector('[data-profile-status]').textContent,/已加载实时/);}finally{w.close();}
+});
+
+const editorHTML=`<div data-md-editor><div class="md-source"><textarea maxlength="60000" id="article-body"></textarea><div data-md-code></div></div><div data-md-preview></div><span data-md-count></span><p data-md-status></p><button data-md-view="write"></button><button data-md-view="split"></button><button data-md-view="preview"></button><button data-md-format="bold"></button><button data-md-undo></button><button data-md-redo></button><button data-md-images></button><div data-md-image-panel hidden><button data-md-close-images></button><button data-md-pick></button><input type="file" data-md-files/><div class="md-upload-box"></div><input data-md-image-url/><input data-md-image-alt/><button data-md-insert-image></button><div data-md-upload-results></div></div><button data-md-link></button><div data-md-link-panel><input data-md-link-text/><input data-md-link-url/><button data-md-close-link></button><button data-md-insert-link></button><p data-md-link-status></p></div></div>`;
+test('CodeMirror format, undo, safe image URL and preview share the underlying Markdown draft',async()=>{
+  const {w,start}=await launch('tests/fixtures/editor-entry.mjs',editorHTML);try{start();w.document.querySelector('[data-md-format="bold"]').click();assert.equal(w.document.querySelector('textarea').value,'**粗体文字**');w.document.querySelector('[data-md-undo]').click();assert.equal(w.document.querySelector('textarea').value,'');w.document.querySelector('[data-md-redo]').click();assert.equal(w.document.querySelector('textarea').value,'**粗体文字**');
+    w.document.querySelector('[data-md-image-url]').value='javascript:alert(1)';w.document.querySelector('[data-md-insert-image]').click();assert.match(w.document.querySelector('[data-md-status]').textContent,/只支持/);assert.equal(w.document.querySelector('[data-md-preview] img'),null);
+    w.document.querySelector('[data-md-image-url]').value='https://example.org/image.png';w.document.querySelector('[data-md-image-alt]').value='接口';w.document.querySelector('[data-md-insert-image]').click();w.document.querySelector('[data-md-view="preview"]').click();assert.equal(w.document.querySelector('[data-md-preview] img').getAttribute('src'),'https://example.org/image.png');assert.equal(w.document.querySelector('[data-md-code]').parentElement.hidden,true);
+  }finally{w.editorFixture?.destroy();w.close();}
+});
+test('Pasted and dropped images upload once, insert Markdown, and unlock the editor after failures',async()=>{
+  const {w,start}=await launch('tests/fixtures/editor-entry.mjs',editorHTML);signedIn(w);let uploads=0,failNext=false,closed=0;
+  w.createImageBitmap=async()=>({width:320,height:180,close(){closed++;}});w.HTMLCanvasElement.prototype.getContext=()=>({drawImage(){}});w.HTMLCanvasElement.prototype.toBlob=function(cb){cb(new w.Blob(['processed-image'],{type:'image/webp'}));};
+  w.fetch=async(url,options)=>{uploads++;assert.equal(url,'https://api.example/images');assert.equal(options.headers['Content-Type'],'image/webp');return failNext?new Response(JSON.stringify({error:'存储额度已满'}),{status:507}):new Response(JSON.stringify({url:'https://api.example/images/'+'a'.repeat(64),size:15,mime:'image/webp'}),{status:201});};
+  try{start();const target=w.document.querySelector('.cm-content'),file=new w.File(['fixture'],'camera.png',{type:'image/png'}),paste=new w.Event('paste',{bubbles:true,cancelable:true});Object.defineProperty(paste,'clipboardData',{value:{files:[file]}});target.dispatchEvent(paste);assert.equal(w.editorFixture.uploading,true);await until(()=>!w.editorFixture.uploading);assert.equal(uploads,1);assert.match(w.document.querySelector('textarea').value,/!\[camera\]\(https:\/\/api.example\/images\//);assert.equal(closed,1);
+    failNext=true;const drop=new w.Event('drop',{bubbles:true,cancelable:true});Object.defineProperty(drop,'dataTransfer',{value:{files:[file]}});w.document.querySelector('.md-upload-box').dispatchEvent(drop);await until(()=>!w.editorFixture.uploading);assert.equal(uploads,2);assert.match(w.document.querySelector('[data-md-status]').textContent,/存储额度已满/);assert.equal(w.document.querySelector('[data-md-pick]').disabled,false);assert.equal(w.document.querySelector('.cm-content').getAttribute('contenteditable'),'true');
+  }finally{w.editorFixture?.destroy();w.close();}
 });

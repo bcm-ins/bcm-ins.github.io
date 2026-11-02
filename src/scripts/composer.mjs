@@ -1,3 +1,4 @@
+import {mountMarkdownEditor} from './markdown-editor.mjs';
 import { markdown } from '../lib/dom.mjs';
 import { parseBoards, validateArticle } from '../lib/boards.mjs';
 import { apiRequest, backendUrl, login, readSession, sessionKey } from '../lib/auth-client.mjs';
@@ -8,10 +9,12 @@ const message=$('[data-message]'),publish=$('[data-publish]');
 const edit=new URLSearchParams(location.search).get('edit');
 const editNumber=/^[1-9]\d{0,9}$/.test(edit||'')?Number(edit):null;
 const key=`cam-ins:draft:v1:${editNumber||'new'}`;
+let editor;
 let boards=[],busy=false,requestId='',fingerprint='',draftAvailable=true;
 const draft =()=>({title:title.value,body:body.value,type:$('input[name=type]:checked')?.value||'article',boards,updatedAt:Date.now(),requestId,fingerprint});
 function note(text,isError=false) { message.textContent=text;message.classList.toggle('error',isError); }
 function save() {
+  editor?.sync();
   try {localStorage.setItem(key,JSON.stringify(draft()));$('[data-save-status]').textContent='草稿已保存到此设备';}
   catch {draftAvailable=false;$('[data-save-status]').textContent='浏览器无法保存草稿，请导出 Markdown 备份';}
   $('[data-word-count]').textContent=`${body.value.length.toLocaleString()} 字符`;
@@ -62,15 +65,14 @@ boardInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault()
 $('[data-add-board]').addEventListener('click',addBoard);
 let timer;[title,body].forEach(el=>el.addEventListener('input',()=>{save();clearTimeout(timer);timer=setTimeout(preview,180);}));
 document.querySelectorAll('input[name=type]').forEach(el=>el.addEventListener('change',save));
-document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{const view=button.dataset.view;$('.editor-panels').dataset.viewMode=view;body.hidden=view==='preview';$('[data-preview]').hidden=view==='write';body.required=view!=='preview';document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));preview();}));
-const formats={bold:['**','**','粗体文字'],italic:['*','*','斜体文字'],heading:['\n## ','\n','小节标题'],link:['[','](https://)','链接文字'],image:['![','](https://)','图片说明'],code:['\n```text\n','\n```\n','代码或日志'],list:['\n- ','\n','列表内容']};
-document.querySelectorAll('[data-format]').forEach(button=>button.addEventListener('click',()=>{const [before,after,placeholder]=formats[button.dataset.format];const selected=body.value.slice(body.selectionStart,body.selectionEnd)||placeholder;const start=body.selectionStart;body.setRangeText(before+selected+after,body.selectionStart,body.selectionEnd,'end');body.focus();body.setSelectionRange(start+before.length,start+before.length+selected.length);save();preview();}));
+editor=mountMarkdownEditor(body);
+$('[data-composer]').addEventListener('md-upload-state',e=>{publish.disabled=e.detail.busy;$('[data-import]').disabled=e.detail.busy;});
 $('[data-release-template]').addEventListener('click',()=>{body.value+=(body.value?'\n\n':'')+'## 作品与版本\n\n## 适配范围与验证状态\n\n## 下载、源码与许可\n\n[下载 Release](https://github.com/你的账号/项目/releases)\n\n文件名：\nSHA-256：\n许可：\n\n## 安装、回退与已知问题\n';save();preview();});
 $('[data-export]').addEventListener('click',()=>{const markdown=`# ${title.value.trim()||'未命名文章'}\n\n${boards.map(b=>'#'+b).join(' ')}\n\n${body.value}`;const url=URL.createObjectURL(new Blob([markdown],{type:'text/markdown;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=(title.value.trim()||'cam-ins-draft').replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').slice(0,80)+'.md';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);note('已导出 Markdown 文件。');});
 $('[data-import]').addEventListener('click',()=>{if((title.value||body.value)&&!confirm('导入会替换当前编辑内容。建议先导出草稿。继续导入？'))return;$('[data-import-file]').click();});
 $('[data-import-file]').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;if(file.size>300000){note('文件过大，请导入 300 KB 以内的 Markdown。',true);return;}const text=await file.text();const titleMatch=text.match(/^#\s+(.+)\r?\n/);const rest=titleMatch?text.slice(titleMatch[0].length).trimStart():text;const parsed=parseBoards(rest);restore({title:titleMatch?.[1]||file.name.replace(/\.md$/i,''),body:parsed.content,boards:parsed.explicitBoards,type:'article'});note('已导入，请检查类型和板块后发布。');e.target.value='';});
 $('[data-composer]').addEventListener('submit',async e=>{
-  e.preventDefault();if(busy || !addBoard())return;
+  e.preventDefault();if(busy || editor?.uploading || !addBoard())return;
   let article;try{article=validateArticle(draft());}catch(err){note(err.message,true);return;}
   if(!readSession()){await beginLogin();return;}
   const currentFingerprint=JSON.stringify(article);if(fingerprint!==currentFingerprint){requestId=crypto.randomUUID();fingerprint=currentFingerprint;save();}
@@ -81,10 +83,10 @@ $('[data-composer]').addEventListener('submit',async e=>{
     $('[data-success]').hidden=false;
     $('[data-success-local]').href=`/post/?number=${result.number}`;
     $('[data-success] h2').textContent=editNumber?'修改已保存。':'文章已发布。';note(`已保存为文章 #${result.number}。网站页面将在自动同步后更新。`);
-    publish.textContent='已保存';busy=false;
+    publish.textContent='已保存';busy=false;editor?.setDisabled(true);
     $('[data-composer]').querySelectorAll('input,textarea,button').forEach(el=>{el.disabled=true;});
     $('[data-success]').scrollIntoView({behavior:'smooth',block:'center'});
   }catch(err){note(err.name==='TimeoutError'?'请求超时，草稿已保留。请先在 GitHub 检查是否已发布，再重试；同一份内容会复用发布标识。':err.message,true);busy=false;publish.disabled=false;updateAccount();}
 });
-window.addEventListener('beforeunload',e=>{if(busy || (!draftAvailable&&(title.value||body.value))){e.preventDefault();e.returnValue='';}});
+window.addEventListener('beforeunload',e=>{if(busy || editor?.uploading || (!draftAvailable&&(title.value||body.value))){e.preventDefault();e.returnValue='';}});
 save();preview();

@@ -1,13 +1,15 @@
+import {mountMarkdownEditor} from './markdown-editor.mjs';
 import {apiRequest,readSession,login} from '../lib/auth-client.mjs';
 import {el,markdown,userLink,button,date,profileHref} from '../lib/dom.mjs';
 const root=document.querySelector('[data-thread]');
 const number=Number(root.dataset.number||new URLSearchParams(location.search).get('number'));
 const $=s=>root.querySelector(s),status=$('[data-thread-status]'),body=$('#reply-body'),message=$('[data-reply-message]');
 const comments=$('[data-comments]'),form=$('[data-reply-form]'),submit=$('[data-submit-reply]');
+let editor;
 let post,pageInfo,live=false,busy=false,loading=false,replyToId=null,editingId=null,targetAuthor='',requestId='',fingerprint='';
 const draftKey=`cam-ins:reply:v1:${number}`;
 function note(text,error=false){message.textContent=text;message.classList.toggle('error',error);}
-function save(){try{localStorage.setItem(draftKey,JSON.stringify({body:body.value,replyToId,editingId,targetAuthor,requestId,fingerprint}));$('[data-reply-save]').textContent='草稿已保存到此设备';}catch{$('[data-reply-save]').textContent='草稿无法保存，请复制备份';}}
+function save(){editor?.sync();try{localStorage.setItem(draftKey,JSON.stringify({body:body.value,replyToId,editingId,targetAuthor,requestId,fingerprint}));$('[data-reply-save]').textContent='草稿已保存到此设备';}catch{$('[data-reply-save]').textContent='草稿无法保存，请复制备份';}}
 function mode(){
   $('[data-reply-title]').textContent=editingId?'编辑回复':replyToId?`回复 @${targetAuthor}`:'发表回复';
   $('[data-cancel-reply]').hidden=!editingId&&!replyToId;
@@ -15,9 +17,12 @@ function mode(){
 }
 try{const d=JSON.parse(localStorage.getItem(draftKey)||'null');if(d){body.value=d.body||'';replyToId=d.replyToId;editingId=d.editingId;targetAuthor=d.targetAuthor;requestId=d.requestId||'';fingerprint=d.fingerprint||'';}}catch{}
 body.addEventListener('input',save);mode();
+editor=mountMarkdownEditor(body);
+form.addEventListener('md-upload-state',e=>{submit.disabled=e.detail.busy||!!(post?.locked||post?.closed);});
+window.addEventListener('beforeunload',e=>{if(editor?.uploading){e.preventDefault();e.returnValue='';}});
 function reset(){replyToId=null;editingId=null;targetAuthor='';requestId='';fingerprint='';mode();save();}
 $('[data-cancel-reply]').addEventListener('click',reset);
-$('[data-preview-reply]').addEventListener('click',e=>{const panel=$('[data-reply-preview]');panel.hidden=!panel.hidden;e.currentTarget.setAttribute('aria-pressed',String(!panel.hidden));panel.replaceChildren(markdown(body.value||'*暂无内容*'));});
+$('[data-preview-reply]').addEventListener('click',e=>{if(editor){editor.preview();return;}const panel=$('[data-reply-preview]');panel.hidden=!panel.hidden;e.currentTarget.setAttribute('aria-pressed',String(!panel.hidden));panel.replaceChildren(markdown(body.value||'*暂无内容*'));});
 async function signedIn(){if(readSession())return true;save();await login(location.pathname+location.search+'#reply-composer');return false;}
 async function action(operation,payload,control,onSuccess){
   if(control.disabled)return;
@@ -26,7 +31,7 @@ async function action(operation,payload,control,onSuccess){
 }
 function selectReply(c,parent){
   if(body.value.trim() && (editingId!==c.id || !editingId) && !confirm('切换回复对象将替换当前输入。继续？'))return;
-  editingId=null;replyToId=parent?.id||c.id;targetAuthor=c.author;body.value=parent?`@${c.author} `:'';requestId='';fingerprint='';mode();save();body.focus();form.scrollIntoView({behavior:'smooth',block:'center'});
+  editingId=null;replyToId=parent?.id||c.id;targetAuthor=c.author;body.value=parent?`@${c.author} `:'';requestId='';fingerprint='';mode();save();editor?editor.focus():body.focus();form.scrollIntoView({behavior:'smooth',block:'center'});
 }
 function renderComment(c,parent){
   const box=el('article',{class:`comment-card${parent?' comment-child':''}`,id:`comment-${c.id}`});
@@ -40,7 +45,7 @@ function renderComment(c,parent){
     const vote=button(`${c.hasUpvoted?'已赞':'点赞'} ${c.upvotes||0}`,()=>action('vote',{commentId:c.id,enabled:!c.hasUpvoted},vote,()=>{c.upvotes=(c.upvotes||0)+(c.hasUpvoted?-1:1);c.hasUpvoted=!c.hasUpvoted;vote.textContent=`${c.hasUpvoted?'已赞':'点赞'} ${c.upvotes}`;vote.setAttribute('aria-pressed',String(c.hasUpvoted));}),{'aria-pressed':String(!!c.hasUpvoted)});vote.disabled=locked||(live&&!c.canUpvote&&!c.hasUpvoted);actions.append(vote);
   }
   if(live&&!c.isMinimized&&c.author===readSession()?.user.login&&c.canEdit){
-    const edit=button('编辑',()=>{if(body.value.trim()&&!confirm('编辑将替换当前输入，继续？'))return;editingId=c.id;replyToId=null;targetAuthor=c.author;body.value=c.body;requestId='';fingerprint='';mode();save();body.focus();form.scrollIntoView({behavior:'smooth',block:'center'});});edit.disabled=locked;actions.append(edit);
+    const edit=button('编辑',()=>{if(body.value.trim()&&!confirm('编辑将替换当前输入，继续？'))return;editingId=c.id;replyToId=null;targetAuthor=c.author;body.value=c.body;requestId='';fingerprint='';mode();save();editor?editor.focus():body.focus();form.scrollIntoView({behavior:'smooth',block:'center'});});edit.disabled=locked;actions.append(edit);
   }
   if(live&&c.author===readSession()?.user.login&&c.canDelete){
     const remove=button('删除',async()=>{if(!confirm('删除这条回复及其跟帖？GitHub 上的原内容也会删除，无法撤销。'))return;remove.disabled=true;try{await apiRequest(`/threads/${number}/comments`,{method:'DELETE',body:JSON.stringify({commentId:c.id,requestId:crypto.randomUUID()})});box.replaceWith(el('p',{class:'deleted-comment'},'回复已删除'));if(!parent){post.comments=Math.max(0,post.comments-1);$('[data-comment-count]').textContent=`(${post.comments})`;}note('回复已删除。');}catch(e){note(e.message,true);remove.disabled=false;}});remove.disabled=locked;actions.append(remove);
@@ -73,7 +78,7 @@ async function renderPost(){
   article.append(source);
   $('[data-author-card]').replaceChildren(userLink(post.author),el('a',{class:'control',href:profileHref(post.author)},'查看个人主页'));
   const boardList=$('[data-thread-boards]');boardList.replaceChildren();for(const board of post.boards||[])boardList.append(await boardLink(board));
-  body.disabled=submit.disabled=!!(post.locked||post.closed);if(body.disabled)note('文章已锁定或关闭，无法发表回复。');
+  body.disabled=submit.disabled=!!(post.locked||post.closed);editor?.setDisabled(body.disabled);if(body.disabled)note('文章已锁定或关闭，无法发表回复。');
 }
 async function load(append=false){
   if(loading)return;loading=true;$('[data-refresh]').disabled=true;
@@ -97,7 +102,7 @@ async function load(append=false){
 }
 $('[data-refresh]').addEventListener('click',()=>load());$('[data-more-comments]').addEventListener('click',()=>load(true));
 form.addEventListener('submit',async e=>{
-  e.preventDefault();if(busy)return;if(!body.value.trim()){note('请输入回复内容。',true);return;}
+  e.preventDefault();if(busy||editor?.uploading)return;if(!body.value.trim()){note('请输入回复内容。',true);return;}
   busy=true;
   try{if(!await signedIn()){busy=false;return;}}catch(e){busy=false;note(e.message,true);return;}
   const payload={body:body.value,replyToId:replyToId||undefined,commentId:editingId||undefined};const current=JSON.stringify(payload);

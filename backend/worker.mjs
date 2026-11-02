@@ -1,5 +1,6 @@
 import { parseBoards, validateArticle } from '../src/lib/boards.mjs';
 import { communityRoute } from './community.mjs';
+import { serveImage, uploadImage } from './images.mjs';
 
 const enc = new TextEncoder();
 const dec = new TextDecoder();
@@ -72,6 +73,7 @@ async function handle(request,env) {
   const url = new URL(request.url); const path = url.pathname;
   if(path==='/health' && request.method==='GET') return json({ready:ready(env), service:'cam-ins-community'});
   if(!ready(env)) fail(503,'站内登录服务尚未配置完成，请稍后再来；草稿可以先在本机保存。');
+  const image=await serveImage(request,env,fail);if(image)return image;
   if(path==='/auth/start' && request.method==='GET') {
     const challenge=url.searchParams.get('challenge'),browserState=url.searchParams.get('state');
     if(!/^[A-Za-z0-9_-]{43}$/.test(challenge||'') || !/^[A-Za-z0-9_-]{43}$/.test(browserState||'')) fail(400,'请从社区发布页重新开始登录。');
@@ -113,6 +115,7 @@ async function handle(request,env) {
     return json({session:id,user:{login:row.login},expiresAt:row.token_expires_at*1000});
   }
   const auth=await session(request,env);
+  if(path==='/images' && request.method==='POST')return json(await uploadImage(request,env,auth,{fail,github,limit,now}),201);
   if(path==='/session' && request.method==='GET') return json({user:{login:auth.login},expiresAt:auth.expires_at*1000});
   if(path==='/session' && request.method==='DELETE') { await env.DB.prepare('DELETE FROM sessions WHERE session_hash=?').bind(auth.sessionHash).run(); return json({loggedOut:true}); }
   const community=await communityRoute(request,env,auth,{github,fail,input,limit,hash,now});
@@ -171,7 +174,7 @@ export default {
     catch(e) { response=json({error:e instanceof ApiError?e.message:'服务暂时不可用。请保留草稿，稍后再试。'},e instanceof ApiError?e.status:500); }
     const headers=new Headers(response.headers);
     if(origin===env.SITE_ORIGIN) { headers.set('Access-Control-Allow-Origin',origin);headers.set('Vary','Origin'); }
-    headers.set('Cache-Control','no-store');headers.set('X-Content-Type-Options','nosniff');headers.set('Referrer-Policy','no-referrer');
+    if(!headers.has('Cache-Control'))headers.set('Cache-Control','no-store');headers.set('X-Content-Type-Options','nosniff');headers.set('Referrer-Policy','no-referrer');
     return new Response(response.body,{status:response.status,headers});
   },
   async scheduled(_event,env) {

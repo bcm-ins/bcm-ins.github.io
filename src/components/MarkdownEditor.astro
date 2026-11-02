@@ -1,0 +1,28 @@
+---
+import Icon from './Icon.astro';
+const {id,compact=false,maxlength=60000,placeholder='写下正文，支持 Markdown。',previewAttribute=false}=Astro.props;
+const tools=[['bold','bold','粗体'],['italic','italic','斜体'],['heading','heading','标题'],['quote','message','引用'],['list','list','列表'],['code','code','代码块'],['table','grid','表格']];
+---
+<div class:list={['md-editor',{compact}]} data-md-editor data-mode="write">
+  <div class="md-toolbar">
+    <div class="md-format-tools" role="group" aria-label="文字格式">
+      {tools.map(([format,icon,label])=><button type="button" data-md-format={format} title={label} aria-label={label}><Icon name={icon} size={17}/></button>)}
+      <span class="md-tool-separator" aria-hidden="true"></span>
+      <button type="button" data-md-link aria-label="插入链接" title="插入链接"><Icon name="link" size={17}/></button>
+      <button type="button" data-md-images class="md-image-button" aria-expanded="false"><Icon name="image" size={17}/><span>图片</span></button>
+      <button type="button" data-md-undo title="撤销 · Ctrl+Z" aria-label="撤销">↶</button><button type="button" data-md-redo title="重做 · Ctrl+Shift+Z" aria-label="重做">↷</button>
+    </div>
+    <div class="md-views" role="group" aria-label="编辑视图"><button type="button" data-md-view="write" aria-pressed="true">撰写</button><button type="button" data-md-view="split" aria-pressed="false">对照</button><button type="button" data-md-view="preview" aria-pressed="false">预览</button></div>
+  </div>
+  <div class="md-link-panel" data-md-link-panel hidden><label>链接文字<input type="text" data-md-link-text placeholder="资料或固件名称"/></label><label>网址<input type="url" data-md-link-url placeholder="https://"/></label><button type="button" data-md-insert-link>插入链接</button><button type="button" data-md-close-link>取消</button><p role="status" data-md-link-status></p></div>
+  <div class="md-images" data-md-image-panel hidden>
+    <div class="md-image-heading"><strong>插入图片</strong><button type="button" data-md-close-images aria-label="关闭图片面板">×</button></div>
+    <div class="md-upload-box"><Icon name="image" size={25}/><div><strong>拖入图片，或粘贴截图</strong><p>PNG / JPG / WebP · 原图最大 20 MB · 自动压缩</p></div><button type="button" data-md-pick>选择图片</button><input type="file" data-md-files accept="image/png,image/jpeg,image/webp" multiple hidden/></div>
+    <p class="md-upload-privacy">上传需要登录。图片上传后即可公开访问，即使文章仍是草稿；请勿上传私密照片。</p>
+    <div class="md-image-url"><label>已有图片网址<input type="url" data-md-image-url placeholder="https://…"/></label><label>图片说明<input type="text" data-md-image-alt maxlength="150" placeholder="如：主板接口位置"/></label><button type="button" data-md-insert-image>插入图片</button></div>
+    <div class="md-upload-results" data-md-upload-results></div>
+  </div>
+  <div class="md-panels"><div class="md-source"><label class="sr-only" for={id}>{compact?'回复内容':'Markdown 正文'}</label><textarea id={id} maxlength={maxlength} placeholder={placeholder} spellcheck="false"></textarea><div class="md-codemirror" data-md-code></div></div><div class="md-preview prose" data-md-preview data-preview={previewAttribute?true:undefined} hidden></div></div>
+  <div class="md-editor-bottom"><span><Icon name="image" size={14}/>拖拽或粘贴图片到编辑区</span><span data-md-count>0 字符</span></div>
+  <p class="md-notice" data-md-status role="status" hidden></p>
+</div>

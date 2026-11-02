@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import MarkdownEditor from './MarkdownEditor.astro';
 import { renderMarkdown } from '../lib/community.mjs';
 const { post }=Astro.props;
 ---
@@ -15,8 +16,7 @@ const { post }=Astro.props;
         <p class="snapshot-note" data-thread-status role="status"></p>
         <form class="reply-composer" id="reply-composer" data-reply-form>
           <div class="reply-compose-heading"><h3 data-reply-title>发表回复</h3><button class="control" type="button" data-cancel-reply hidden>取消引用 / 编辑</button></div>
-          <label for="reply-body" class="sr-only">回复内容</label><textarea id="reply-body" rows="5" maxlength="50000" placeholder="回复内容，支持 Markdown" required></textarea>
-          <div class="reply-preview prose" data-reply-preview hidden></div>
+          <MarkdownEditor id="reply-body" compact={true} maxlength={50000} placeholder="回复内容，支持 Markdown"/>
           <div class="reply-controls"><span data-reply-save>草稿保存在此设备</span><button class="control" type="button" data-preview-reply aria-pressed="false">预览</button><button class="button" type="submit" data-submit-reply>发表回复</button></div>
           <p data-reply-message class="composer-message" role="status"></p>
         </form>
